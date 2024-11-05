@@ -1,18 +1,15 @@
-package com.jovisco.tutorial;
+package com.jovisco.tutorial.invoicingpdf;
 
 
 import org.apache.pdfbox.Loader;
-import org.apache.pdfbox.contentstream.PDContentStream;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.PDPageContentStream.AppendMode;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
-import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
-import org.apache.pdfbox.pdmodel.graphics.state.PDGraphicsState;
-import org.apache.pdfbox.util.Matrix;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -52,22 +49,19 @@ class AppTest {
     private final static String FOOTER_FILENAME = "jovisco-letter-foot.png";
     private final static float FOOTER_WIDTH = 481.1f;
     private final static float FOOTER_HEIGHT = 70.0f;
-    private final static float[] TEMPLATE_COLOR = {1.0f/255.0f, 94.0f/255.0f, 104.0f/255.0f};
-    private final static float LINE_WIDTH = 163.0f * PDFPageCoordsOnA4.PAGE_WIDTH_FACTOR;
-    private final static float REFERENCE_UNDERLINE_WIDTH = 38.0f * PDFPageCoordsOnA4.PAGE_WIDTH_FACTOR;
+    private final static int[] TEMPLATE_COLOR = {1, 94, 104};
+    private final static float LINE_WIDTH = 163.0f * PdfPageCoordsOnA4.PAGE_WIDTH_FACTOR;
+    private final static float REFERENCE_UNDERLINE_WIDTH = 38.0f * PdfPageCoordsOnA4.PAGE_WIDTH_FACTOR;
 
     private final PDType1Font font = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
 
-    private final CreatePdfRequest request = new CreatePdfRequest(
-            "5222", "2.11.2024", "4711",
-            "Rechnung",
-            new String[]{"Jovisco AG", "Kapitalstr. 123", "", "12345 Berlin"},
-            "Oktober 2024","12.345,67 €");
-    private static Map<String, PDFPageCoordsOnA4> elementPositions = new HashMap<>();
+    private static Map<String, PdfPageCoordsOnA4> elementPositions;
+    private static CreatePdfRequest request;
 
     @BeforeAll
     static void init() {
         elementPositions = getElementPositions();
+        request = makePdfRequest();
     }
 
     @Nested
@@ -76,6 +70,36 @@ class AppTest {
         @Test
         void shouldWork() {
             assertTrue(true);
+        }
+    }
+
+    @Nested
+    @DisplayName("Test Base Template")
+    class BaseTemplateTests {
+
+        @Test
+        @DisplayName("should create the base template")
+        void shouldCreateBaseTemplate() {
+            var generator = new BaseTemplateDEdeGenerator("target/test-basetemplate.pdf");
+            var template = generator.generate();
+            assertNotNull(template);
+        }
+    }
+
+    @Nested
+    @DisplayName("Test Invoice Template")
+    class InvoiceTemplateTests {
+
+        @Test
+        @DisplayName("should create the invoice template")
+        void shouldCreateBInvoiceTemplate() throws URISyntaxException, IOException {
+            var request = makePdfInvoiceTemplateRequest();
+            var generator = new InvoiceTemplateDEdeGenerator(
+                    request,
+                    "target/test-basetemplate.pdf",
+                    "target/test-invoicetemplate.pdf");
+            var template = generator.generate();
+            assertNotNull(template);
         }
     }
 
@@ -200,7 +224,7 @@ class AppTest {
 //                float headerYFromBottomInMM = pageHeightInMM - headerYFromTopInMM;
 //                float headerXPos = headerXFromLeftInMM * pageWidthUnitConversionFactor;
 //                float headerYPos = headerYFromBottomInMM * pageHeightConversionFactor;
-                var headerCoords = PDFPageCoordsOnA4.ofTopLeftInMM(headerXFromLeftInMM, headerYFromTopInMM);
+                var headerCoords = PdfPageCoordsOnA4.ofTopLeftInMM(headerXFromLeftInMM, headerYFromTopInMM);
                 System.out.println("header coordinates: " + headerCoords.xPos() + ", " + headerCoords.yPos());
                 // address line coordinates
                 float addressLineXFromLeftInMM = 25;
@@ -208,7 +232,7 @@ class AppTest {
 //                float addressLineYFromBottomInMM = pageHeightInMM - addressLineYFromTopInMM;
 //                float addressLineXPos = addressLineXFromLeftInMM * pageWidthUnitConversionFactor;
 //                float addressLineYPos = addressLineYFromBottomInMM * pageHeightConversionFactor;
-                var addressLineCoords = PDFPageCoordsOnA4.ofTopLeftInMM(addressLineXFromLeftInMM, addressLineYFromTopInMM);
+                var addressLineCoords = PdfPageCoordsOnA4.ofTopLeftInMM(addressLineXFromLeftInMM, addressLineYFromTopInMM);
                 System.out.println("address line coordinates: " + addressLineCoords.xPos() + ", " + addressLineCoords.yPos());
                 // invoice title coordinates
                 float invoiceTitleXFromLeftInMM = 26;
@@ -216,7 +240,7 @@ class AppTest {
 //                float invoiceTitleYFromBottomInMM = pageHeightInMM - invoiceTitleYFromTopInMM;
 //                float invoiceTitleXPos = invoiceTitleXFromLeftInMM * pageWidthUnitConversionFactor;
 //                float invoiceTitleYPos = invoiceTitleYFromBottomInMM * pageHeightConversionFactor;
-                var invoiceTitleCoords = PDFPageCoordsOnA4.ofTopLeftInMM(invoiceTitleXFromLeftInMM, invoiceTitleYFromTopInMM);
+                var invoiceTitleCoords = PdfPageCoordsOnA4.ofTopLeftInMM(invoiceTitleXFromLeftInMM, invoiceTitleYFromTopInMM);
                 System.out.println("invoice title coordinates: " + invoiceTitleCoords.xPos() + ", " + invoiceTitleCoords.yPos());
                 // reference coordinates
                 float referenceXFromLeftInMM = 138;
@@ -224,7 +248,7 @@ class AppTest {
 //                float referenceYFromBottomInMM = pageHeightInMM - referenceYFromTopInMM;
 //                float referenceXPos = referenceXFromLeftInMM * pageWidthUnitConversionFactor;
 //                float referenceYPos = referenceYFromBottomInMM * pageHeightConversionFactor;
-                var referenceCoords = PDFPageCoordsOnA4.ofTopLeftInMM(referenceXFromLeftInMM, referenceYFromTopInMM);
+                var referenceCoords = PdfPageCoordsOnA4.ofTopLeftInMM(referenceXFromLeftInMM, referenceYFromTopInMM);
                 System.out.println("reference coordinates: " + referenceCoords.xPos() + ", " + referenceCoords.yPos());
                 // page number coordinates
                 float pageNumberXFromLeftInMM = 138;
@@ -232,7 +256,7 @@ class AppTest {
 //                float pageNumberYFromBottomInMM = pageHeightInMM - pageNumberYFromTopInMM;
 //                float pageNumberXPos = pageNumberXFromLeftInMM * pageWidthUnitConversionFactor;
 //                float pageNumberYPos = pageNumberYFromBottomInMM * pageHeightConversionFactor;
-                var pageNumberCoords = PDFPageCoordsOnA4.ofTopLeftInMM(pageNumberXFromLeftInMM, pageNumberYFromTopInMM);
+                var pageNumberCoords = PdfPageCoordsOnA4.ofTopLeftInMM(pageNumberXFromLeftInMM, pageNumberYFromTopInMM);
                 System.out.println("page number coordinates: " + pageNumberCoords.xPos() + ", " + pageNumberCoords.yPos());
                 // billing period coordinates
                 float billingPeriodXFromLeftInMM = 26;
@@ -240,7 +264,7 @@ class AppTest {
 //                float billingPeriodYFromBottomInMM = pageHeightInMM - billingPeriodYFromTopInMM;
 //                float billingPeriodXPos = billingPeriodXFromLeftInMM * pageWidthUnitConversionFactor;
 //                float billingPeriodYPos = billingPeriodYFromBottomInMM * pageHeightConversionFactor;
-                var billingPeriodCoords = PDFPageCoordsOnA4.ofTopLeftInMM(billingPeriodXFromLeftInMM, billingPeriodYFromTopInMM);
+                var billingPeriodCoords = PdfPageCoordsOnA4.ofTopLeftInMM(billingPeriodXFromLeftInMM, billingPeriodYFromTopInMM);
                 System.out.println("billing period coordinates: " + billingPeriodCoords.xPos() + ", " + billingPeriodCoords.yPos());
                 // items column header coordinates  - upper line
                 float itemsColumnHeaderUpperLineXFromLeftInMM = 26;
@@ -249,7 +273,7 @@ class AppTest {
 //                float itemsColumnHeaderUpperLineXPos = itemsColumnHeaderUpperLineXFromLeftInMM * pageWidthUnitConversionFactor;
 //                float itemsColumnHeaderUpperLineYPos = itemsColumnHeaderUpperLineYFromBottomInMM * pageHeightConversionFactor;
                 float itemsColumnHeaderLineWidthInMM = 158;
-                var itemsColumnHeaderUpperLineCoords = PDFPageCoordsOnA4.ofTopLeftInMM(itemsColumnHeaderUpperLineXFromLeftInMM, itemsColumnHeaderUpperLineYFromTopInMM);
+                var itemsColumnHeaderUpperLineCoords = PdfPageCoordsOnA4.ofTopLeftInMM(itemsColumnHeaderUpperLineXFromLeftInMM, itemsColumnHeaderUpperLineYFromTopInMM);
                 System.out.println("items column header upper line coordinates: " + itemsColumnHeaderUpperLineCoords.xPos() + ", " + itemsColumnHeaderUpperLineCoords.yPos());
                 // items column header coordinates  - lower line
                 float itemsColumnHeaderLowerLineXFromLeftInMM = 26;
@@ -257,7 +281,7 @@ class AppTest {
 //                float itemsColumnHeaderLowerLineYFromBottomInMM = pageHeightInMM - itemsColumnHeaderLowerLineYFromTopInMM;
 //                float itemsColumnHeaderLowerLineXPos = itemsColumnHeaderLowerLineXFromLeftInMM * pageWidthUnitConversionFactor;
 //                float itemsColumnHeaderLowerLineYPos = itemsColumnHeaderLowerLineYFromBottomInMM * pageHeightConversionFactor;
-                var itemsColumnHeaderLowerLineCoords = PDFPageCoordsOnA4.ofTopLeftInMM(itemsColumnHeaderLowerLineXFromLeftInMM, itemsColumnHeaderLowerLineYFromTopInMM);
+                var itemsColumnHeaderLowerLineCoords = PdfPageCoordsOnA4.ofTopLeftInMM(itemsColumnHeaderLowerLineXFromLeftInMM, itemsColumnHeaderLowerLineYFromTopInMM);
                 System.out.println("items column header lower line coordinates: " + itemsColumnHeaderLowerLineCoords.xPos() + ", " + itemsColumnHeaderLowerLineCoords.yPos());
                 // footer coordinates
                 float footerXFromRightInMM = 25;
@@ -265,7 +289,7 @@ class AppTest {
 //                float footerYFromBottomInMM = pageHeightInMM - footerYFromTopInMM;
 //                float footerXPos = footerXFromRightInMM * pageWidthUnitConversionFactor;
 //                float footerYPos = footerYFromBottomInMM * pageHeightConversionFactor;
-                var footerCoords = PDFPageCoordsOnA4.ofTopLeftInMM(footerXFromRightInMM, footerYFromTopInMM);
+                var footerCoords = PdfPageCoordsOnA4.ofTopLeftInMM(footerXFromRightInMM, footerYFromTopInMM);
                 System.out.println("footer coordinates: " + footerCoords.xPos() + ", " + footerCoords.yPos());
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -280,7 +304,7 @@ class AppTest {
                 // prepare meta information
                 fillMetaInformation(template);
                 // get images
-                var images = getImages(template);
+                var images = getTemplateImages(template);
                 // create and add page to document
                 var page = new PDPage(PDRectangle.A4);
                 assertNotNull(page);
@@ -288,31 +312,19 @@ class AppTest {
                 // prepare content for template
                 try (var contentStream = new PDPageContentStream(template, page)) {
                     assertNotNull(contentStream);
+                    // draw header image
                     var headerImage = images.get("header");
-                    var headerCoords = elementPositions.get("header");
-                    contentStream.drawImage(headerImage,
-                            headerCoords.xPos(),
-                            headerCoords.yPos(),
-                            HEADER_WIDTH,
-                            HEADER_HEIGHT);
+                    headerImage.draw(contentStream);
+                    // draw address line image
                     var addressLineImage = images.get("addressLine");
-                    var addressLineCoords = elementPositions.get("addressLine");
-                    contentStream.drawImage(addressLineImage,
-                            addressLineCoords.xPos(),
-                            addressLineCoords.yPos(),
-                            ADDRESS_LINE_WIDTH,
-                            ADDRESS_LINE_HEIGHT);
+                    addressLineImage.draw(contentStream);
+                    // draw footer image
                     var footerImage = images.get("footer");
-                    var footerCoords = elementPositions.get("footer");
-                    contentStream.drawImage(footerImage,
-                            footerCoords.xPos(),
-                            footerCoords.yPos(),
-                            FOOTER_WIDTH,
-                            FOOTER_HEIGHT);
+                    footerImage.draw(contentStream);
                 }
                 // save template
                 template.save("target/basetemplate.pdf");
-            } catch (IOException e) {
+            } catch (IOException | URISyntaxException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -331,35 +343,43 @@ class AppTest {
                 assertNotNull(page);
 
                 // add invoice specific content
-                try (var contentStream = new PDPageContentStream(doc, page, PDPageContentStream.AppendMode.APPEND, false, true)) {
-                    // set color for all kinds of drawings
-                    contentStream.setStrokingColor(TEMPLATE_COLOR[0], TEMPLATE_COLOR[1], TEMPLATE_COLOR[2]);
-                    contentStream.beginText();
-                    contentStream.setFont(font, 24);
-                    contentStream.setLeading(15.0f);
-                    var titleCoords = elementPositions.get("invoiceTitle");
-                    contentStream.newLineAtOffset(titleCoords.xPos(), titleCoords.yPos());
-                    contentStream.setNonStrokingColor(TEMPLATE_COLOR[0], TEMPLATE_COLOR[1], TEMPLATE_COLOR[2]);
-                    contentStream.showText(request.title());
-                    contentStream.newLine();
-                    contentStream.endText();
+                try (var cs = new PDPageContentStream(doc, page, AppendMode.APPEND, false, true)) {
+                    // print invoice title
+                    var dimensions = new PdfDimensions(26.0f, 92.0f, 40.0f, 24.0f);
+                    var invoiceTitle = InvoicingPdfText.builder()
+                            .contentStream(cs)
+                            .text(request.title())
+                            .dimensions(dimensions)
+                            .font(font)
+                            .colorRGB(TEMPLATE_COLOR)
+                            .build();
+                    cs.beginText();
+                    invoiceTitle.printText();
+                    cs.endText();
                     // print reference header line
-                    contentStream.beginText();
-                    contentStream.setFont(font, 9);
-                    var referenceLineCoords = elementPositions.get("reference");
-                    assertNotNull(referenceLineCoords);
-                    contentStream.newLineAtOffset(referenceLineCoords.xPos(), referenceLineCoords.yPos());
-                    contentStream.showText("Bitte bei Zahlung angeben:");
-                    contentStream.endText();
+                    dimensions = new PdfDimensions(138.0f, 96.0f, 20.0f, 9.0f);
+                    var referenceTitle = InvoicingPdfText.builder()
+                            .contentStream(cs)
+                            .text(request.referenceTitle())
+                            .dimensions(dimensions)
+                            .font(font)
+                            .build();
+                    cs.beginText();
+                    referenceTitle.printText();
+                    cs.endText();
                     // draw underline for above text
-                    var underline = elementPositions.get("referenceUnderline");
-                    assertNotNull(underline);
-                    drawLine(contentStream, underline.xPos(), underline.yPos(), REFERENCE_UNDERLINE_WIDTH);
+                    dimensions = new PdfDimensions(138.0f, 98.0f, REFERENCE_UNDERLINE_WIDTH, 1.0f);
+                    var underline = InvoicingPdfLine.builder()
+                            .contentStream(cs)
+                            .dimensions(dimensions)
+                            .colorRGB(TEMPLATE_COLOR)
+                            .build();
+                    underline.draw();
                     // column header
-                    printColumnHeader(contentStream);
+                    printColumnHeader(cs);
 
                     // print totals header
-                    printTotalsHeader(contentStream);
+                    printTotalsHeader(cs);
                 }
                 // save invoice template
                 doc.save("target/invoicetemplate.pdf");
@@ -367,98 +387,157 @@ class AppTest {
         }
     }
 
-    private static Map<String, PDFPageCoordsOnA4> getElementPositions() {
+    private static Map<String, PdfPageCoordsOnA4> getElementPositions() {
 
-        Map<String, PDFPageCoordsOnA4> elementPositions = new HashMap<>();
+        Map<String, PdfPageCoordsOnA4> elementPositions = new HashMap<>();
 
         float headerXFromLeftInMM = 70.0f;
         float headerYFromTopInMM = 17.0f;
-        var headerCoords = PDFPageCoordsOnA4.ofTopLeftWithHeightInMM(
+        var headerCoords = PdfPageCoordsOnA4.ofTopLeftWithHeightInMM(
                 headerXFromLeftInMM, headerYFromTopInMM, HEADER_HEIGHT);
         elementPositions.put("header", headerCoords);
 
         float addressLineXFromLeftInMM = 25.0f;
         float addressLineYFromTopInMM = 54.0f;
-        var addressLineCoords = PDFPageCoordsOnA4.ofTopLeftWithHeightInMM(
+        var addressLineCoords = PdfPageCoordsOnA4.ofTopLeftWithHeightInMM(
                 addressLineXFromLeftInMM, addressLineYFromTopInMM, ADDRESS_LINE_HEIGHT);
         elementPositions.put("addressLine", addressLineCoords);
 
         float invoiceTitleXFromLeftInMM = 26.0f;
         float invoiceTitleYFromTopInMM = 92.0f;
-        var invoiceTitleCoords = PDFPageCoordsOnA4.ofTopLeftWithHeightInMM(
+        var invoiceTitleCoords = PdfPageCoordsOnA4.ofTopLeftWithHeightInMM(
                 invoiceTitleXFromLeftInMM, invoiceTitleYFromTopInMM, TITLE_HEIGHT);
         elementPositions.put("invoiceTitle", invoiceTitleCoords);
 
         float referenceXFromLeftInMM = 138.0f;
         float referenceYFromTopInMM = 96.0f;
-        var referenceCoords = PDFPageCoordsOnA4.ofTopLeftInMM(referenceXFromLeftInMM, referenceYFromTopInMM);
+        var referenceCoords = PdfPageCoordsOnA4.ofTopLeftInMM(referenceXFromLeftInMM, referenceYFromTopInMM);
         elementPositions.put("reference", referenceCoords);
 
         float referenceUnderlineXFromLeftInMM = referenceXFromLeftInMM;
         float referenceUnderlineYFromTopInMM = 96.0f + 1.0f;
-        var referenceUnderlineCoords = PDFPageCoordsOnA4.ofTopLeftInMM(
+        var referenceUnderlineCoords = PdfPageCoordsOnA4.ofTopLeftInMM(
                 referenceUnderlineXFromLeftInMM, referenceUnderlineYFromTopInMM);
         elementPositions.put("referenceUnderline", referenceUnderlineCoords);
 
         float pageNumberXFromLeftInMM = 138.0f;
         float pageNumberYFromTopInMM = 119.0f;
-        var pageNumberCoords = PDFPageCoordsOnA4.ofTopLeftInMM(pageNumberXFromLeftInMM, pageNumberYFromTopInMM);
+        var pageNumberCoords = PdfPageCoordsOnA4.ofTopLeftInMM(pageNumberXFromLeftInMM, pageNumberYFromTopInMM);
         elementPositions.put("pageNumber", pageNumberCoords);
 
         float billingPeriodXFromLeftInMM = 26.0f;
         float billingPeriodYFromTopInMM = 112.0f;
-        var billingPeriodCoords = PDFPageCoordsOnA4.ofTopLeftInMM(billingPeriodXFromLeftInMM, billingPeriodYFromTopInMM);
+        var billingPeriodCoords = PdfPageCoordsOnA4.ofTopLeftInMM(billingPeriodXFromLeftInMM, billingPeriodYFromTopInMM);
         elementPositions.put("billingPeriod", billingPeriodCoords);
 
         float itemsColumnHeaderUpperLineXFromLeftInMM = 26.0f;
         float itemsColumnHeaderUpperLineYFromTopInMM = 124.0f;
-        var itemsColumnHeaderUpperLineCoords = PDFPageCoordsOnA4.ofTopLeftInMM(
+        var itemsColumnHeaderUpperLineCoords = PdfPageCoordsOnA4.ofTopLeftInMM(
                 itemsColumnHeaderUpperLineXFromLeftInMM,
                 itemsColumnHeaderUpperLineYFromTopInMM);
         elementPositions.put("itemsColumnHeaderUpperLine", itemsColumnHeaderUpperLineCoords);
 
         float itemsColumnHeaderXFromLeftInMM = 26.5f;
         float itemsColumnHeaderYFromTopInMM = 128.0f;
-        var itemsColumnHeaderCoords = PDFPageCoordsOnA4.ofTopLeftInMM(
+        var itemsColumnHeaderCoords = PdfPageCoordsOnA4.ofTopLeftInMM(
                 itemsColumnHeaderXFromLeftInMM,
                 itemsColumnHeaderYFromTopInMM);
         elementPositions.put("itemsColumnHeader", itemsColumnHeaderCoords);
 
         float itemsColumnHeaderLowerLineXFromLeftInMM = 26.0f;
         float itemsColumnHeaderLowerLineYFromTopInMM = 130.0f;
-        var itemsColumnHeaderLowerLineCoords = PDFPageCoordsOnA4.ofTopLeftInMM(
+        var itemsColumnHeaderLowerLineCoords = PdfPageCoordsOnA4.ofTopLeftInMM(
                 itemsColumnHeaderLowerLineXFromLeftInMM,
                 itemsColumnHeaderLowerLineYFromTopInMM);
         elementPositions.put("itemsColumnHeaderLowerLine", itemsColumnHeaderLowerLineCoords);
 
         float itemsTotalHeaderUpperLineXFromLeftInMM = 26.0f;
         float itemsTotalHeaderUpperLineYFromTopInMM = 136.0f;
-        var itemsTotalHeaderUpperLineCoords = PDFPageCoordsOnA4.ofTopLeftInMM(
+        var itemsTotalHeaderUpperLineCoords = PdfPageCoordsOnA4.ofTopLeftInMM(
                 itemsTotalHeaderUpperLineXFromLeftInMM,
                 itemsTotalHeaderUpperLineYFromTopInMM);
         elementPositions.put("itemsTotalHeaderUpperLine", itemsTotalHeaderUpperLineCoords);
 
         float itemsTotalHeaderXFromLeftInMM = 26.5f;
         float itemsTotalHeaderYFromTopInMM = 140.0f;
-        var itemsTotalHeaderCoords = PDFPageCoordsOnA4.ofTopLeftInMM(
+        var itemsTotalHeaderCoords = PdfPageCoordsOnA4.ofTopLeftInMM(
                 itemsTotalHeaderXFromLeftInMM,
                 itemsTotalHeaderYFromTopInMM);
         elementPositions.put("itemsTotalHeader", itemsTotalHeaderCoords);
 
         float itemsTotalHeaderLowerLineXFromLeftInMM = 26.0f;
         float itemsTotalHeaderLowerLineYFromTopInMM = 142.0f;
-        var itemsTotalHeaderLowerLineCoords = PDFPageCoordsOnA4.ofTopLeftInMM(
+        var itemsTotalHeaderLowerLineCoords = PdfPageCoordsOnA4.ofTopLeftInMM(
                 itemsTotalHeaderLowerLineXFromLeftInMM,
                 itemsTotalHeaderLowerLineYFromTopInMM);
         elementPositions.put("itemsTotalHeaderLowerLine", itemsTotalHeaderLowerLineCoords);
 
         float footerXFromLeftInMM = 25.0f;
         float footerYFromTopInMM = 282.0f;
-        var footerCoords = PDFPageCoordsOnA4.ofTopLeftWithHeightInMM(
+        var footerCoords = PdfPageCoordsOnA4.ofTopLeftWithHeightInMM(
                 footerXFromLeftInMM, footerYFromTopInMM, FOOTER_HEIGHT);
         elementPositions.put("footer", footerCoords);
 
         return elementPositions;
+    }
+
+    private static CreatePdfInvoiceTemplateRequest makePdfInvoiceTemplateRequest() {
+        var textBuilder = new StringBuilder("Pos")
+                .append("____")
+                .append("Menge")
+                .append("_____")
+                .append("Beschreibung")
+                .append("____________________________________")
+                .append("Einzelpreis")
+                .append("________")
+                .append("Gesamtpreis");
+        var columnsheader = textBuilder
+                .toString()
+                .replaceAll("_", "  ");
+        textBuilder = new StringBuilder("_______")
+                .append("Nettobetrag")
+                .append("______________________")
+                .append("19% MwSt")
+                .append("___________________________________")
+                .append("Bruttobetrag");
+        var totalsHeader = textBuilder
+                .toString()
+                .replaceAll("_", "  ");
+        return new CreatePdfInvoiceTemplateRequest(
+                "Rechnung",
+                "Bitte bei Zahlung angeben:",
+                columnsheader,
+                totalsHeader);
+    }
+
+    private static CreatePdfRequest makePdfRequest() {
+        var textBuilder = new StringBuilder("Pos")
+                .append("____")
+                .append("Menge")
+                .append("_____")
+                .append("Beschreibung")
+                .append("____________________________________")
+                .append("Einzelpreis")
+                .append("________")
+                .append("Gesamtpreis");
+        var columnsheader = textBuilder
+                .toString()
+                .replaceAll("_", "  ");
+        textBuilder = new StringBuilder("_______")
+                .append("Nettobetrag")
+                .append("______________________")
+                .append("19% MwSt")
+                .append("___________________________________")
+                .append("Bruttobetrag");
+        var totalsHeader = textBuilder
+                .toString()
+                .replaceAll("_", "  ");
+        return new CreatePdfRequest(
+                "5222", "2.11.2024", "4711",
+                "Rechnung",
+                new String[]{"Jovisco AG", "Kapitalstr. 123", "", "12345 Berlin"},
+                "Oktober 2024","Bitte bei Zahlung angeben:",
+                columnsheader, totalsHeader,"12.345,67 €");
     }
 
     private void fillMetaInformation(PDDocument doc) {
@@ -493,6 +572,33 @@ class AppTest {
             throw new RuntimeException(e);
         }
     }
+    private Map<String, InvoicingPdfTemplateImage> getTemplateImages(PDDocument doc) throws IOException, URISyntaxException {
+
+        Map<String, InvoicingPdfTemplateImage> images = new HashMap<>();
+
+        var headerCoords = elementPositions.get("header");
+        var headerImage = new InvoicingPdfTemplateImage(
+                doc,
+                Paths.get(ClassLoader.getSystemResource(HEADER_FILENAME).toURI()),
+                new PdfDimensions(headerCoords.xPos(), headerCoords.yPos(), HEADER_WIDTH, HEADER_HEIGHT));
+        images.put("header", headerImage);
+
+        var addressLineCoords = elementPositions.get("addressLine");
+        var addressLineImage = new InvoicingPdfTemplateImage(
+                doc,
+                Paths.get(ClassLoader.getSystemResource(ADDRESS_LINE_FILENAME).toURI()),
+                new PdfDimensions(addressLineCoords.xPos(), addressLineCoords.yPos(), ADDRESS_LINE_WIDTH, ADDRESS_LINE_HEIGHT));
+        images.put("addressLine", addressLineImage);
+
+        var footerCoords = elementPositions.get("footer");
+        var footerImage = new InvoicingPdfTemplateImage(
+                doc,
+                Paths.get(ClassLoader.getSystemResource(FOOTER_FILENAME).toURI()),
+                new PdfDimensions(footerCoords.xPos(), footerCoords.yPos(), FOOTER_WIDTH, FOOTER_HEIGHT));
+        images.put("footer", footerImage);
+
+        return images;
+    }
 
     private void drawLine(PDPageContentStream cs, float xPos, float yPos, float width) throws IOException {
 
@@ -504,59 +610,50 @@ class AppTest {
     private void printColumnHeader(PDPageContentStream cs) throws IOException {
 
         // draw column header upper line
-        var lineCoords = elementPositions.get("itemsColumnHeaderUpperLine");
-        drawLine(cs, lineCoords.xPos(), lineCoords.yPos(), LINE_WIDTH);
+        var line = InvoicingPdfLine.builder()
+                .contentStream(cs)
+                .dimensions(new PdfDimensions(26.0f, 124.0f, LINE_WIDTH, 1.0f))
+                .build();
+        line.draw();
         // column headers
+        var header = InvoicingPdfText.builder()
+                .contentStream(cs)
+                .dimensions(new PdfDimensions(26.5f, 126.5f, LINE_WIDTH, 9.0f))
+                .text(request.columnsHeader())
+                .build();
         cs.beginText();
-        cs.setFont(font, 9);
-        var coords = elementPositions.get("itemsColumnHeader");
-        var textBuilder = new StringBuilder("Pos")
-                .append("____")
-                .append("Menge")
-                .append("_____")
-                .append("Beschreibung")
-                .append("____________________________________")
-                .append("Einzelpreis")
-                .append("________")
-                .append("Gesamtpreis");
-        var text = textBuilder
-                .toString()
-                .replaceAll("_", "  ");
-        var xPos = coords.xPos();
-        cs.newLineAtOffset(xPos, coords.yPos());
-        cs.showText(text);
+        header.printText();
         cs.endText();
         // draw column header lower line
-        cs.setStrokingColor(TEMPLATE_COLOR[0], TEMPLATE_COLOR[1], TEMPLATE_COLOR[2]);
-        lineCoords = elementPositions.get("itemsColumnHeaderLowerLine");
-        drawLine(cs, lineCoords.xPos(), lineCoords.yPos(), LINE_WIDTH);
+        line = InvoicingPdfLine.builder()
+                .contentStream(cs)
+                .dimensions(new PdfDimensions(26.0f, 130.0f, LINE_WIDTH, 1.0f))
+                .build();
+        line.draw();
     }
 
     private void printTotalsHeader(PDPageContentStream cs) throws IOException {
 
         // draw column header upper line
-        var lineCoords = elementPositions.get("itemsTotalHeaderUpperLine");
-        drawLine(cs, lineCoords.xPos(), lineCoords.yPos(), LINE_WIDTH);
+        var line = InvoicingPdfLine.builder()
+                .contentStream(cs)
+                .dimensions(new PdfDimensions(26.0f, 136.0f, LINE_WIDTH, 1.0f))
+                .build();
+        line.draw();
         // column headers
+        var header = InvoicingPdfText.builder()
+                .contentStream(cs)
+                .dimensions(new PdfDimensions(26.5f, 138.5f, LINE_WIDTH, 9.0f))
+                .text(request.totalsHeader())
+                .build();
         cs.beginText();
-        cs.setFont(font, 9);
-        var coords = elementPositions.get("itemsTotalHeader");
-        var textBuilder = new StringBuilder("_______")
-                .append("Nettobetrag")
-                .append("______________________")
-                .append("19% MwSt")
-                .append("___________________________________")
-                .append("Bruttobetrag");
-        var text = textBuilder
-                .toString()
-                .replaceAll("_", "  ");
-        var xPos = coords.xPos();
-        cs.newLineAtOffset(xPos, coords.yPos());
-        cs.showText(text);
+        header.printText();
         cs.endText();
         // draw column header lower line
-        cs.setStrokingColor(TEMPLATE_COLOR[0], TEMPLATE_COLOR[1], TEMPLATE_COLOR[2]);
-        lineCoords = elementPositions.get("itemsTotalHeaderLowerLine");
-        drawLine(cs, lineCoords.xPos(), lineCoords.yPos(), LINE_WIDTH);
+        line = InvoicingPdfLine.builder()
+                .contentStream(cs)
+                .dimensions(new PdfDimensions(26.0f, 142.0f, LINE_WIDTH, 1.0f))
+                .build();
+        line.draw();
     }
 }

@@ -1,4 +1,4 @@
-package com.jovisco.tutorial;
+package com.jovisco.tutorial.invoicingpdf;
 
 public record CreatePdfRequest(
         String invoiceId,
@@ -7,5 +7,8 @@ public record CreatePdfRequest(
         String title,
         String[] addressLines,
         String billingPeriod,
+        String referenceTitle,
+        String columnsHeader,
+        String totalsHeader,
         String formattedTotalNetAmount)
 {}
