@@ -1,4 +1,4 @@
-package com.jovisco.tutorial;
+package com.jovisco.invoicing;
 
 /**
  * Hello world!

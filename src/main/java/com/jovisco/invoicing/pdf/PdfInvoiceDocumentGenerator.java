@@ -1,4 +1,4 @@
-package com.jovisco.tutorial.invoicingpdf;
+package com.jovisco.invoicing.pdf;
 
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -12,11 +12,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 
-public abstract class InvoicingPdfDocumentGenerator implements InvoicingPdfGenerator {
+public abstract class PdfInvoiceDocumentGenerator implements PdfDocumentGenerator {
 
     protected static final int[] TEXT_COLOR = {0, 0, 0};
     protected static final int[] TEMPLATE_COLOR = {1, 94, 104};
-    private final static float LINE_WIDTH = 163.0f * PdfPageCoordsOnA4.PAGE_WIDTH_FACTOR;
+    private final static float LINE_WIDTH = 163.0f * PdfDimensions.PAGE_WIDTH_FACTOR;
 
     protected final CreatePdfInvoiceDocumentRequest request;
     protected final String invoiceTemplateFilePath;
@@ -28,7 +28,7 @@ public abstract class InvoicingPdfDocumentGenerator implements InvoicingPdfGener
     protected PDPageContentStream cs;
     protected float posY;
 
-    public InvoicingPdfDocumentGenerator(
+    public PdfInvoiceDocumentGenerator(
             CreatePdfInvoiceDocumentRequest request,
             String invoiceTemplateFilePath,
             String targetFilePath)
@@ -81,12 +81,12 @@ public abstract class InvoicingPdfDocumentGenerator implements InvoicingPdfGener
     }
 
     protected void generateAddressLines() throws IOException {
-        InvoicingPdfTextBlock.builder()
+        PdfTextBlock.builder()
                 .contentStream(cs)
                 .textLines(request.addressLines())
                 .font(font)
                 .colorRGB(TEXT_COLOR)
-                .dimensions(new PdfDimensions(26.0f, 58.0f, 250.0f, 12.0f))
+                .dimensions(PdfDimensions.ofA4mm(26.0f, 58.0f, 250.0f, 12.0f))
                 .leading(15.0f)
                 .build()
                 .printTextBlock();
@@ -99,39 +99,39 @@ public abstract class InvoicingPdfDocumentGenerator implements InvoicingPdfGener
     }
 
     protected void printInvoiceId() throws IOException {
-        InvoicingPdfText.builder()
+        PdfText.builder()
                 .contentStream(cs)
                 .text(request.invoiceId())
-                .dimensions(new PdfDimensions(167.0f, 107.0f, 30.0f, 12.0f))
+                .dimensions(PdfDimensions.ofA4mm(167.0f, 107.0f, 30.0f, 12.0f))
                 .colorRGB(TEXT_COLOR)
                 .build()
                 .printText();
     }
 
     protected void printCustomerId() throws IOException {
-        InvoicingPdfText.builder()
+        PdfText.builder()
                 .contentStream(cs)
                 .text(request.customerId())
-                .dimensions(new PdfDimensions(167.0f, 101.0f, 30.0f, 12.0f))
+                .dimensions(PdfDimensions.ofA4mm(167.0f, 101.0f, 30.0f, 12.0f))
                 .colorRGB(TEXT_COLOR)
                 .build()
                 .printText();
     }
 
     protected void printInvoiceDate() throws IOException {
-        InvoicingPdfText.builder()
+        PdfText.builder()
                 .contentStream(cs)
                 .text(request.formattedInvoiceDate())
-                .dimensions(new PdfDimensions(167.0f, 113.0f, 30.0f, 12.0f))
+                .dimensions(PdfDimensions.ofA4mm(167.0f, 113.0f, 30.0f, 12.0f))
                 .colorRGB(TEXT_COLOR)
                 .build()
                 .printText();
     }
 
     protected void generateBillingPeriod() throws IOException {
-        InvoicingPdfText.builder()
+        PdfText.builder()
                 .contentStream(cs)
-                .dimensions(new PdfDimensions(26.0f, 111.0f, 250.0f, 12.0f))
+                .dimensions(PdfDimensions.ofA4mm(26.0f, 111.0f, 250.0f, 12.0f))
                 .text(request.billingPeriod())
                 .colorRGB(TEXT_COLOR)
                 .build()
@@ -156,60 +156,60 @@ public abstract class InvoicingPdfDocumentGenerator implements InvoicingPdfGener
 
     protected void printItemId(String itemId) throws IOException {
         var itemX = 28.0f - (itemId.length() * 1.0f) + 1;
-        InvoicingPdfText.builder()
+        PdfText.builder()
                 .contentStream(cs)
                 .font(font)
                 .colorRGB(TEXT_COLOR)
                 .text(itemId)
-                .dimensions(new PdfDimensions(itemX, posY, 5.0f, 12.0f))
+                .dimensions(PdfDimensions.ofA4mm(itemX, posY, 5.0f, 12.0f))
                 .build()
                 .printText();
     }
 
     protected void printItemQuantity(String quantity) throws IOException {
         var itemX = 47.0f - (quantity.length() * 2.0f) + 1;
-        InvoicingPdfText.builder()
+        PdfText.builder()
                 .contentStream(cs)
                 .font(font)
                 .colorRGB(TEXT_COLOR)
                 .text(quantity)
-                .dimensions(new PdfDimensions(itemX, posY, 10.0f, 12.0f))
+                .dimensions(PdfDimensions.ofA4mm(itemX, posY, 10.0f, 12.0f))
                 .build()
                 .printText();
     }
 
     protected void printItemDescription(String description) throws IOException {
         var fontSize = 12.0f - (float) (description.length() / 35);
-        InvoicingPdfText.builder()
+        PdfText.builder()
                 .contentStream(cs)
                 .font(font)
                 .colorRGB(TEXT_COLOR)
                 .text(description)
-                .dimensions(new PdfDimensions(58.0f, posY, 80.0f, fontSize))
+                .dimensions(PdfDimensions.ofA4mm(58.0f, posY, 80.0f, fontSize))
                 .build()
                 .printText();
     }
 
     protected void printItemUnitNetAmount(String amount) throws IOException {
         var itemX = 155.0f - (amount.length() * 2.1f) + 1;
-        InvoicingPdfText.builder()
+        PdfText.builder()
                 .contentStream(cs)
                 .font(font)
                 .colorRGB(TEXT_COLOR)
                 .text(amount)
-                .dimensions(new PdfDimensions(itemX, posY, 20.0f, 12.0f))
+                .dimensions(PdfDimensions.ofA4mm(itemX, posY, 20.0f, 12.0f))
                 .build()
                 .printText();
     }
 
     protected void printItemTotalNetAmount(String amount) throws IOException {
         var itemX = 185.0f - (amount.length() * 1.8f) + 1;
-        InvoicingPdfText.builder()
+        PdfText.builder()
                 .contentStream(cs)
                 .font(font)
                 .colorRGB(TEXT_COLOR)
                 .text(amount)
-                .dimensions(new PdfDimensions(itemX, posY, 25.0f, 12.0f))
+                .dimensions(PdfDimensions.ofA4mm(itemX, posY, 25.0f, 12.0f))
                 .build()
                 .printText();
     }
@@ -219,19 +219,19 @@ public abstract class InvoicingPdfDocumentGenerator implements InvoicingPdfGener
         posY += 5.0f;
         generateItemsTotalAmounts();
         posY += 5.0f;
-        drawLine(new PdfDimensions(26.0f, posY, LINE_WIDTH, 1.0f));
+        drawLine(PdfDimensions.ofA4mm(26.0f, posY, LINE_WIDTH, 1.0f));
     }
 
     protected void generateItemsTotalsHeader() throws IOException {
-        drawLine(new PdfDimensions(26.0f, posY, LINE_WIDTH, 1.0f));
+        drawLine(PdfDimensions.ofA4mm(26.0f, posY, LINE_WIDTH, 1.0f));
         posY += 2.5f;
         generateItemsTotalsHeaderTexts();
         posY += 3.0f;
-        drawLine(new PdfDimensions(26.0f, posY, LINE_WIDTH, 1.0f));
+        drawLine(PdfDimensions.ofA4mm(26.0f, posY, LINE_WIDTH, 1.0f));
     }
 
     protected void drawLine(PdfDimensions dimensions) throws IOException {
-        InvoicingPdfLine.builder()
+        PdfLine.builder()
                 .contentStream(cs)
                 .dimensions(dimensions)
                 .colorRGB(TEMPLATE_COLOR)
@@ -240,9 +240,9 @@ public abstract class InvoicingPdfDocumentGenerator implements InvoicingPdfGener
     }
 
     protected void generateItemsTotalsHeaderTexts() throws IOException {
-        InvoicingPdfText.builder()
+        PdfText.builder()
                 .contentStream(cs)
-                .dimensions(new PdfDimensions(26.5f, posY, LINE_WIDTH, 9.0f))
+                .dimensions(PdfDimensions.ofA4mm(26.5f, posY, LINE_WIDTH, 9.0f))
                 .text(request.totalsHeader())
                 .font(font)
                 .colorRGB(TEMPLATE_COLOR)
@@ -258,44 +258,44 @@ public abstract class InvoicingPdfDocumentGenerator implements InvoicingPdfGener
 
     protected void printTotalNetAmount() throws IOException {
         var posX = 51.5f - (request.formattedTotalGrossAmount().length() * 1.8f) + 1;
-        InvoicingPdfText.builder()
+        PdfText.builder()
                 .contentStream(cs)
                 .font(font)
                 .colorRGB(TEXT_COLOR)
                 .text(request.formattedTotalNetAmount())
-                .dimensions(new PdfDimensions(posX, posY, 25.0f, 12.0f))
+                .dimensions(PdfDimensions.ofA4mm(posX, posY, 25.0f, 12.0f))
                 .build()
                 .printText();
     }
 
     protected void printTotalVatAmount() throws IOException {
         var posX = 108.0f - (request.formattedTotalGrossAmount().length() * 1.8f) + 1;
-        InvoicingPdfText.builder()
+        PdfText.builder()
                 .contentStream(cs)
                 .font(font)
                 .colorRGB(TEXT_COLOR)
                 .text(request.formattedTotalVatAmount())
-                .dimensions(new PdfDimensions(posX, posY, 25.0f, 12.0f))
+                .dimensions(PdfDimensions.ofA4mm(posX, posY, 25.0f, 12.0f))
                 .build()
                 .printText();
     }
 
     protected void printTotalGrossAmount() throws IOException {
         var posX = 185.0f - (request.formattedTotalGrossAmount().length() * 1.8f) + 1;
-        InvoicingPdfText.builder()
+        PdfText.builder()
                 .contentStream(cs)
                 .font(font)
                 .colorRGB(TEXT_COLOR)
                 .text(request.formattedTotalGrossAmount())
-                .dimensions(new PdfDimensions(posX, posY, 25.0f, 12.0f))
+                .dimensions(PdfDimensions.ofA4mm(posX, posY, 25.0f, 12.0f))
                 .build()
                 .printText();
     }
     protected void generatePaymentTerm() throws IOException {
         posY += 10.0f;
-        InvoicingPdfText.builder()
+        PdfText.builder()
                 .contentStream(cs)
-                .dimensions(new PdfDimensions(26.5f, posY, 50.0f, 9.0f))
+                .dimensions(PdfDimensions.ofA4mm(26.5f, posY, 50.0f, 9.0f))
                 .text(request.paymentTerms())
                 .font(font)
                 .colorRGB(TEMPLATE_COLOR)
@@ -305,12 +305,12 @@ public abstract class InvoicingPdfDocumentGenerator implements InvoicingPdfGener
 
     protected void generateOptionalInvoiceTexts() throws IOException {
         posY += 10.0f;
-        InvoicingPdfTextBlock.builder()
+        PdfTextBlock.builder()
                 .contentStream(cs)
                 .textLines(request.optionalInvoiceTexts())
                 .font(new PDType1Font(Standard14Fonts.FontName.HELVETICA_OBLIQUE))
                 .colorRGB(TEXT_COLOR)
-                .dimensions(new PdfDimensions(26.0f, posY, 250.0f, 12.0f))
+                .dimensions(PdfDimensions.ofA4mm(26.0f, posY, 250.0f, 12.0f))
                 .leading(15.0f)
                 .build()
                 .printTextBlock();

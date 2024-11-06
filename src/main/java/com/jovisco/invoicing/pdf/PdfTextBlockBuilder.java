@@ -1,9 +1,9 @@
-package com.jovisco.tutorial.invoicingpdf;
+package com.jovisco.invoicing.pdf;
 
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
-public class InvoicingPdfTextBlockBuilder {
+public class PdfTextBlockBuilder {
 
     private PDPageContentStream contentStream;
     private String[] textLines;
@@ -12,39 +12,39 @@ public class InvoicingPdfTextBlockBuilder {
     private int[] colorRGB;
     private float leading;
 
-    InvoicingPdfTextBlockBuilder() {}
+    PdfTextBlockBuilder() {}
 
-    InvoicingPdfTextBlock build() {
-        return new InvoicingPdfTextBlock(
+    PdfTextBlock build() {
+        return new PdfTextBlock(
                 contentStream, textLines, dimensions, font, colorRGB, leading);
     }
 
-    InvoicingPdfTextBlockBuilder contentStream(PDPageContentStream contentStream) {
+    PdfTextBlockBuilder contentStream(PDPageContentStream contentStream) {
         this.contentStream = contentStream;
         return this;
     }
 
-    InvoicingPdfTextBlockBuilder textLines(String[] textLines) {
+    PdfTextBlockBuilder textLines(String[] textLines) {
         this.textLines = textLines;
         return this;
     }
 
-    InvoicingPdfTextBlockBuilder dimensions(PdfDimensions dimensions) {
+    PdfTextBlockBuilder dimensions(PdfDimensions dimensions) {
         this.dimensions = dimensions;
         return this;
     }
 
-    InvoicingPdfTextBlockBuilder font(PDType1Font font) {
+    PdfTextBlockBuilder font(PDType1Font font) {
         this.font = font;
         return this;
     }
 
-    InvoicingPdfTextBlockBuilder colorRGB(int[] colorRGB) {
+    PdfTextBlockBuilder colorRGB(int[] colorRGB) {
         this.colorRGB = colorRGB;
         return this;
     }
 
-    InvoicingPdfTextBlockBuilder leading(float leading) {
+    PdfTextBlockBuilder leading(float leading) {
         this.leading = leading;
         return this;
     }

@@ -1,10 +1,8 @@
-package com.jovisco.tutorial.invoicingpdf;
+package com.jovisco.invoicing.pdf;
 
-import org.apache.pdfbox.pdmodel.PDDocument;
+public class PdfInvoiceDocumentGeneratorDEde extends PdfInvoiceDocumentGenerator {
 
-public class InvoicingPdfDocumentDEdeGenerator extends InvoicingPdfDocumentGenerator {
-
-    public InvoicingPdfDocumentDEdeGenerator(
+    public PdfInvoiceDocumentGeneratorDEde(
             CreatePdfInvoiceDocumentRequest request,
             String invoiceTemplateFilePath,
             String targetFilePath) {

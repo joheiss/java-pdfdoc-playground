@@ -1,4 +1,4 @@
-package com.jovisco.tutorial.invoicingpdf;
+package com.jovisco.invoicing.pdf;
 
 public record CreatePdfInvoiceTemplateRequest(
         String title,

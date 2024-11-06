@@ -1,11 +1,11 @@
-package com.jovisco.tutorial.invoicingpdf;
+package com.jovisco.invoicing.pdf;
 
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
 import java.io.IOException;
 
-public class InvoicingPdfTextBlock {
+public class PdfTextBlock {
 
     private final PDPageContentStream cs;
     private final String[] textLines;
@@ -14,26 +14,26 @@ public class InvoicingPdfTextBlock {
     private float[] color = null;
     private float leading = 15.0f;
 
-    public static InvoicingPdfTextBlockBuilder builder() {
-        return new InvoicingPdfTextBlockBuilder();
+    public static PdfTextBlockBuilder builder() {
+        return new PdfTextBlockBuilder();
     }
 
-    public InvoicingPdfTextBlock(PDPageContentStream cs, String[] textLines, PdfDimensions dimensions, PDType1Font font,
-                                 int[] color, float leading) {
+    public PdfTextBlock(PDPageContentStream cs, String[] textLines, PdfDimensions dimensions, PDType1Font font,
+                        int[] color, float leading) {
         this(cs, textLines, dimensions, font);
         if (color != null) this.color = new float[]{color[0]/255.0f, color[1]/255.0f, color[2]/255.0f};
         if (leading > 0) this.leading = leading;
     }
 
-    public InvoicingPdfTextBlock(PDPageContentStream cs, String[] textLines, PdfDimensions dimensions, PDType1Font font) {
+    public PdfTextBlock(PDPageContentStream cs, String[] textLines, PdfDimensions dimensions, PDType1Font font) {
         this(cs, textLines, dimensions);
         this.font = font;
     }
 
-    public InvoicingPdfTextBlock(PDPageContentStream cs, String[] textLines, PdfDimensions dimensions) {
+    public PdfTextBlock(PDPageContentStream cs, String[] textLines, PdfDimensions dimensions) {
         this.cs = cs;
         this.textLines = textLines;
-        this.dimensions = PdfDimensions.calculateDimensions(dimensions);
+        this.dimensions = dimensions;
     }
 
     public void printTextBlock() throws IOException {

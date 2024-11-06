@@ -1,0 +1,57 @@
+@startuml
+skinparam nodesep 50
+skinparam ranksep 50
+skinparam class {
+  BackgroundColor<<interface>> #ffccff
+  BackgroundColor<<abstract>> #ccccff
+}
+
+class PdfLine {
+    {field} - dimensions : PdfDimensions
+    {field} - color : float[]
+    {field} ...
+    + draw()
+}
+
+class PdfImage {
+    {field} - dimensions : PdfDimensions
+    {field} - image : PDXImageXObject
+    {field} ...
+    + draw()
+}
+
+class PdfText {
+    {field} - dimensions : PdfDimensions
+    {field} - text : String
+    {field} - font : PDType1Font
+    {field} - color : float[]
+    {field} ...
+    + printText()
+}
+
+class PdfTextBlock {
+    {field} - dimensions : PdfDimensions
+    {field} - textLines : String[]
+    {field} - font : PDType1Font
+    {field} - color : float[]
+    {field} ...
+    + printTextLines()
+}
+
+class PdfDimensions {
+    {field} - x : float
+    {field} - y : float
+    {field} - width : float
+    {field} - height : float
+    {static} + ofA4mm(float x, float y, float width, float height)
+    {static} + ofA4(float x, float y, float width, float height)
+}
+PdfLineBuilder --> PdfLine : creates
+PdfImageBuilder --> PdfImage : creates
+PdfTextBuilder --> PdfText : creates
+PdfTextBlockBuilder --> PdfTextBlock : creates
+PdfLine *-d- PdfDimensions
+PdfImage *-d- PdfDimensions
+PdfText *-d- PdfDimensions
+PdfTextBlock *-d- PdfDimensions
+@enduml

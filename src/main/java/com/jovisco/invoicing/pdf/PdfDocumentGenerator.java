@@ -1,8 +1,8 @@
-package com.jovisco.tutorial.invoicingpdf;
+package com.jovisco.invoicing.pdf;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 
-public interface InvoicingPdfGenerator {
+public interface PdfDocumentGenerator {
 
     PDDocument generate();
     boolean documentExists(String filePath);

@@ -1,0 +1,29 @@
+@startuml
+skinparam nodesep 50
+skinparam ranksep 50
+skinparam class {
+  BackgroundColor<<interface>> #ffccff
+  BackgroundColor<<abstract>> #ccccff
+}
+
+interface PdfDocumentGenerator {
+    + generate() : PDDocument
+}
+abstract class PdfInvoiceDocumentGenerator implements PdfDocumentGenerator {
+    ...
+    + generate() : PDDocument
+    # generateContent()
+    {method} ...
+}
+class PdfInvoiceDocumentGeneratorDEde extends PdfInvoiceDocumentGenerator {
+    ...
+    + generate() : PDDocument
+    # generateContent()
+    {method} ...
+}
+
+PdfInvoiceDocumentGeneratorDEde ...> PdfText : uses
+PdfInvoiceDocumentGeneratorDEde ...> PdfTextBox : uses
+PdfInvoiceDocumentGeneratorDEde ...> PdfLine : uss
+PdfInvoiceDocumentGeneratorDEde ...> PdfDimensions : uses
+@enduml

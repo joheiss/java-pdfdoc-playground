@@ -1,4 +1,4 @@
-package com.jovisco.tutorial.invoicingpdf;
+package com.jovisco.invoicing.pdf;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -10,24 +10,24 @@ import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.Calendar;
 
-public class BaseTemplateDEdeGenerator implements InvoicingPdfGenerator {
+public class PdfBaseTemplateGenerator implements PdfDocumentGenerator {
 
-    private final static String HEADER_FILENAME = "jovisco-letter-head.png";
-    private final static float HEADER_WIDTH = 226.4f;
-    private final static float HEADER_HEIGHT = 80.0f;
-    private final static float ADDRESS_LINE_WIDTH = 201.0f;
-    private final static float ADDRESS_LINE_HEIGHT = 10.0f;
-    private final static String ADDRESS_LINE_FILENAME = "adresse_mini.jpg";
-    private final static float FOOTER_WIDTH = 481.1f;
-    private final static float FOOTER_HEIGHT = 70.0f;
-    private final static String FOOTER_FILENAME = "jovisco-letter-foot.png";
+    protected final static String HEADER_FILENAME = "jovisco-letter-head.png";
+    protected final static float HEADER_WIDTH = 226.4f;
+    protected final static float HEADER_HEIGHT = 80.0f;
+    protected final static float ADDRESS_LINE_WIDTH = 201.0f;
+    protected final static float ADDRESS_LINE_HEIGHT = 10.0f;
+    protected final static String ADDRESS_LINE_FILENAME = "adresse_mini.jpg";
+    protected final static float FOOTER_WIDTH = 481.1f;
+    protected final static float FOOTER_HEIGHT = 70.0f;
+    protected final static String FOOTER_FILENAME = "jovisco-letter-foot.png";
 
-    private final String filePath;
-    private PDDocument template;
-    private PDPage page;
-    private PDPageContentStream cs;
+    protected final String filePath;
+    protected PDDocument template;
+    protected PDPage page;
+    protected PDPageContentStream cs;
 
-    public BaseTemplateDEdeGenerator(String filePath) {
+    public PdfBaseTemplateGenerator(String filePath) {
         this.filePath = filePath;
     }
 
@@ -37,8 +37,7 @@ public class BaseTemplateDEdeGenerator implements InvoicingPdfGenerator {
         try (var template = new PDDocument()) {
             this.template = template;
             fillMetaInformation();
-            var page = new PDPage(PDRectangle.A4);
-            this.page = page;
+            this.page = new PDPage(PDRectangle.A4);
             template.addPage(page);
             generateContent();
             template.save(filePath);
@@ -48,7 +47,7 @@ public class BaseTemplateDEdeGenerator implements InvoicingPdfGenerator {
         }
     }
 
-    private void generateContent() throws IOException, URISyntaxException {
+    protected void generateContent() throws IOException, URISyntaxException {
 
         try (var cs = new PDPageContentStream(template, page)) {
             this.cs = cs;
@@ -58,37 +57,37 @@ public class BaseTemplateDEdeGenerator implements InvoicingPdfGenerator {
         }
     }
 
-    private void generateHeaderImage() throws IOException, URISyntaxException {
-        InvoicingPdfImage.builder()
+    protected void generateHeaderImage() throws IOException, URISyntaxException {
+        PdfImage.builder()
                 .document(template)
                 .contentStream(cs)
-                .dimensions(new PdfDimensions(70.0f, 17.0f, HEADER_WIDTH, HEADER_HEIGHT))
+                .dimensions(PdfDimensions.ofA4mm(70.0f, 17.0f, HEADER_WIDTH, HEADER_HEIGHT))
                 .imagePath(Paths.get(ClassLoader.getSystemResource(HEADER_FILENAME).toURI()))
                 .build()
                 .draw();
     }
-    
-    private void generateAddressLineImage() throws IOException, URISyntaxException {
-        InvoicingPdfImage.builder()
+
+    protected void generateAddressLineImage() throws IOException, URISyntaxException {
+        PdfImage.builder()
                 .document(template)
                 .contentStream(cs)
-                .dimensions(new PdfDimensions(25.0f, 54.0f,  ADDRESS_LINE_WIDTH, ADDRESS_LINE_HEIGHT))
+                .dimensions(PdfDimensions.ofA4mm(25.0f, 54.0f,  ADDRESS_LINE_WIDTH, ADDRESS_LINE_HEIGHT))
                 .imagePath(Paths.get(ClassLoader.getSystemResource(ADDRESS_LINE_FILENAME).toURI()))
                 .build()
                 .draw();
     }
 
-    private void generateFooterImage() throws IOException, URISyntaxException {
-        InvoicingPdfImage.builder()
+    protected void generateFooterImage() throws IOException, URISyntaxException {
+        PdfImage.builder()
                 .document(template)
                 .contentStream(cs)
-                .dimensions(new PdfDimensions(25.0f, 282.0f, FOOTER_WIDTH, FOOTER_HEIGHT))
+                .dimensions(PdfDimensions.ofA4mm(25.0f, 282.0f, FOOTER_WIDTH, FOOTER_HEIGHT))
                 .imagePath(Paths.get(ClassLoader.getSystemResource(FOOTER_FILENAME).toURI()))
                 .build()
                 .draw();
     }
 
-    private void fillMetaInformation() {
+    protected void fillMetaInformation() {
 
         var now = Calendar.getInstance();
 

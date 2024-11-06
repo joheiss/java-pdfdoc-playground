@@ -1,11 +1,11 @@
-package com.jovisco.tutorial.invoicingpdf;
+package com.jovisco.invoicing.pdf;
 
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
 import java.io.IOException;
 
-public class InvoicingPdfText {
+public class PdfText {
 
     private final PDPageContentStream cs;
     private final String text;
@@ -13,24 +13,24 @@ public class InvoicingPdfText {
     private PDType1Font font = null;
     private float[] color = null;
 
-    public static InvoicingPdfTextBuilder builder() {
-        return new InvoicingPdfTextBuilder();
+    public static PdfTextBuilder builder() {
+        return new PdfTextBuilder();
     }
 
-    public InvoicingPdfText(PDPageContentStream cs, String text, PdfDimensions dimensions, PDType1Font font, int[] color) {
+    public PdfText(PDPageContentStream cs, String text, PdfDimensions dimensions, PDType1Font font, int[] color) {
         this(cs, text, dimensions, font);
         if (color != null) this.color = new float[]{color[0]/255.0f, color[1]/255.0f, color[2]/255.0f};
     }
 
-    public InvoicingPdfText(PDPageContentStream cs, String text, PdfDimensions dimensions, PDType1Font font) {
+    public PdfText(PDPageContentStream cs, String text, PdfDimensions dimensions, PDType1Font font) {
         this(cs, text, dimensions);
         this.font = font;
     }
 
-    public InvoicingPdfText(PDPageContentStream cs, String text, PdfDimensions dimensions) {
+    public PdfText(PDPageContentStream cs, String text, PdfDimensions dimensions) {
         this.cs = cs;
         this.text = text;
-        this.dimensions = PdfDimensions.calculateDimensions(dimensions);
+        this.dimensions = dimensions;
     }
 
     public void printText() throws IOException {
@@ -41,6 +41,4 @@ public class InvoicingPdfText {
         cs.showText(text);
         cs.endText();
     }
-
-
 }

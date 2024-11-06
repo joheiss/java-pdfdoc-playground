@@ -1,4 +1,4 @@
-package com.jovisco.tutorial.invoicingpdf;
+package com.jovisco.invoicing.pdf;
 
 
 import org.junit.jupiter.api.DisplayName;
@@ -28,7 +28,7 @@ class AppTest {
         @Test
         @DisplayName("should create the base template")
         void shouldCreateBaseTemplate() {
-            var generator = new BaseTemplateDEdeGenerator("target/test-basetemplate.pdf");
+            var generator = new PdfBaseTemplateGeneratorDEde("target/test-basetemplate.pdf");
             var template = generator.generate();
             assertNotNull(template);
         }
@@ -42,7 +42,7 @@ class AppTest {
         @DisplayName("should create the invoice template")
         void shouldCreateBInvoiceTemplate() throws IOException {
             var request = makePdfInvoiceTemplateRequest();
-            var generator = new InvoiceTemplateDEdeGenerator(
+            var generator = new PdfInvoiceTemplateGeneratorDEde(
                     request,
                     "target/test-basetemplate.pdf",
                     "target/test-invoicetemplate.pdf");
@@ -59,7 +59,7 @@ class AppTest {
         @DisplayName("should create a invoice document")
         void shouldCreateInvoiceDocument() {
             var request = makePdfInvoiceDocumentRequest();
-            var generator = new InvoicingPdfDocumentDEdeGenerator(
+            var generator = new PdfInvoiceDocumentGeneratorDEde(
                     request,
                     "target/test-invoicetemplate.pdf",
                     "target/test-invoice-" + request.invoiceId() + ".pdf");

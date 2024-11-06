@@ -1,4 +1,4 @@
-package com.jovisco.tutorial.invoicingpdf;
+package com.jovisco.invoicing.pdf;
 
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -13,22 +13,22 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Calendar;
 
-public class InvoiceTemplateDEdeGenerator implements InvoicingPdfGenerator {
+public class PdfInvoiceTemplateGenerator implements PdfDocumentGenerator {
 
-    private static final int[] TEMPLATE_COLOR = {1, 94, 104};
-    private final static float LINE_WIDTH = 163.0f * PdfPageCoordsOnA4.PAGE_WIDTH_FACTOR;
-    private final static float REFERENCE_UNDERLINE_WIDTH = 38.0f * PdfPageCoordsOnA4.PAGE_WIDTH_FACTOR;
+    protected static final int[] TEMPLATE_COLOR = {1, 94, 104};
+    protected final static float LINE_WIDTH = 163.0f * PdfDimensions.PAGE_WIDTH_FACTOR;
+    protected final static float REFERENCE_UNDERLINE_WIDTH = 38.0f * PdfDimensions.PAGE_WIDTH_FACTOR;
 
-    private final CreatePdfInvoiceTemplateRequest request;
-    private final String baseTemplateFilePath;
-    private final String targetFilePath;
-    private final PDType1Font font = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
+    protected final CreatePdfInvoiceTemplateRequest request;
+    protected final String baseTemplateFilePath;
+    protected final String targetFilePath;
+    protected final PDType1Font font = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
 
-    private PDDocument template;
-    private PDPage page;
-    private PDPageContentStream cs;
+    protected PDDocument template;
+    protected PDPage page;
+    protected PDPageContentStream cs;
 
-    public InvoiceTemplateDEdeGenerator(
+    public PdfInvoiceTemplateGenerator(
             CreatePdfInvoiceTemplateRequest request,
             String baseTemplateFilePath,
             String targetFilePath)
@@ -53,7 +53,7 @@ public class InvoiceTemplateDEdeGenerator implements InvoicingPdfGenerator {
         }
     }
 
-    private void fillMetaInformation() {
+    protected void fillMetaInformation() {
 
         var now = Calendar.getInstance();
 
@@ -67,7 +67,7 @@ public class InvoiceTemplateDEdeGenerator implements InvoicingPdfGenerator {
         metadata.setProducer("PDFBox");
     }
 
-    private void generateContent() throws IOException {
+    protected void generateContent() throws IOException {
 
         try (var cs = new PDPageContentStream(template, page, AppendMode.APPEND, false, true)) {
             this.cs = cs;
@@ -77,99 +77,96 @@ public class InvoiceTemplateDEdeGenerator implements InvoicingPdfGenerator {
         }
     }
 
-    private void generateInvoiceTitle() throws IOException {
-        InvoicingPdfText.builder()
+    protected void generateInvoiceTitle() throws IOException {
+        PdfText.builder()
                 .contentStream(cs)
                 .text(request.title())
-                .dimensions(new PdfDimensions(26.0f, 92.0f, 40.0f, 24.0f))
+                .dimensions(PdfDimensions.ofA4mm(26.0f, 92.0f, 40.0f, 24.0f))
                 .font(font)
                 .colorRGB(TEMPLATE_COLOR)
                 .build()
                 .printText();
     }
 
-    private void generateReferenceTitleAndLabel() throws IOException {
-        // print reference title
+    protected void generateReferenceTitleAndLabel() throws IOException {
         printReferenceTitle();
-        // draw underline for above text
         printReferenceTitleUnderline();
-        // print reference labels
         generateReferenceLabels();
     }
 
-    private void printReferenceTitle() throws IOException {
-        InvoicingPdfText.builder()
+    protected void printReferenceTitle() throws IOException {
+        PdfText.builder()
                 .contentStream(cs)
                 .text(request.referenceTitle())
-                .dimensions(new PdfDimensions(150.0f, 96.0f, 20.0f, 9.0f))
+                .dimensions(PdfDimensions.ofA4mm(150.0f, 96.0f, 20.0f, 9.0f))
                 .font(font)
                 .build()
                 .printText();
     }
 
-    private void printReferenceTitleUnderline() throws IOException {
-        InvoicingPdfLine.builder()
+    protected void printReferenceTitleUnderline() throws IOException {
+        PdfLine.builder()
                 .contentStream(cs)
-                .dimensions(new PdfDimensions(150.0f, 98.0f, REFERENCE_UNDERLINE_WIDTH, 1.0f))
+                .dimensions(PdfDimensions.ofA4mm(150.0f, 98.0f, REFERENCE_UNDERLINE_WIDTH, 1.0f))
                 .colorRGB(TEMPLATE_COLOR)
                 .build()
                 .draw();
     }
 
-    private void generateReferenceLabels() throws IOException {
+    protected void generateReferenceLabels() throws IOException {
         printInvoiceIdLabel();
         printCustomerIdLabel();
         printInvoiceDateLabel();
     }
 
-    private void printInvoiceIdLabel() throws IOException {
-        InvoicingPdfText.builder()
+    protected void printInvoiceIdLabel() throws IOException {
+        PdfText.builder()
                 .contentStream(cs)
                 .text("Re.Nr.")
-                .dimensions(new PdfDimensions(150.0f, 107.0f, 30.0f, 12.0f))
+                .dimensions(PdfDimensions.ofA4mm(150.0f, 107.0f, 30.0f, 12.0f))
                 .colorRGB(TEMPLATE_COLOR)
                 .build()
                 .printText();
     }
 
-    private void printCustomerIdLabel() throws IOException {
-        InvoicingPdfText.builder()
+    protected void printCustomerIdLabel() throws IOException {
+        PdfText.builder()
                 .contentStream(cs)
                 .text("Kd.Nr.")
-                .dimensions(new PdfDimensions(150.0f, 101.0f, 30.0f, 12.0f))
+                .dimensions(PdfDimensions.ofA4mm(150.0f, 101.0f, 30.0f, 12.0f))
                 .colorRGB(TEMPLATE_COLOR)
                 .build()
                 .printText();
     }
 
-    private void printInvoiceDateLabel() throws IOException {
-        InvoicingPdfText.builder()
+    protected void printInvoiceDateLabel() throws IOException {
+        PdfText.builder()
                 .contentStream(cs)
                 .text("Datum")
-                .dimensions(new PdfDimensions(150.0f, 113.0f, 30.0f, 12.0f))
+                .dimensions(PdfDimensions.ofA4mm(150.0f, 113.0f, 30.0f, 12.0f))
                 .colorRGB(TEMPLATE_COLOR)
                 .build()
                 .printText();
     }
 
-    private void generateItemsColumnsHeader() throws IOException {
-        drawLine(new PdfDimensions(26.0f, 124.0f, LINE_WIDTH, 1.0f));
+    protected void generateItemsColumnsHeader() throws IOException {
+        drawLine(PdfDimensions.ofA4mm(26.0f, 124.0f, LINE_WIDTH, 1.0f));
         generateItemsColumnsHeaderTexts();
-        drawLine(new PdfDimensions(26.0f, 130.0f, LINE_WIDTH, 1.0f));
+        drawLine(PdfDimensions.ofA4mm(26.0f, 130.0f, LINE_WIDTH, 1.0f));
     }
 
-    private void drawLine(PdfDimensions dimensions) throws IOException {
-        InvoicingPdfLine.builder()
+    protected void drawLine(PdfDimensions dimensions) throws IOException {
+        PdfLine.builder()
                 .contentStream(cs)
                 .dimensions(dimensions)
                 .build()
                 .draw();
     }
 
-    private void generateItemsColumnsHeaderTexts() throws IOException {
-        InvoicingPdfText.builder()
+    protected void generateItemsColumnsHeaderTexts() throws IOException {
+        PdfText.builder()
                 .contentStream(cs)
-                .dimensions(new PdfDimensions(26.5f, 126.5f, LINE_WIDTH, 9.0f))
+                .dimensions(PdfDimensions.ofA4mm(26.5f, 126.5f, LINE_WIDTH, 9.0f))
                 .text(request.columnsHeader())
                 .build()
                 .printText();

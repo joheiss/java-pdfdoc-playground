@@ -1,4 +1,4 @@
-package com.jovisco.tutorial.invoicingpdf;
+package com.jovisco.invoicing.pdf;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -7,19 +7,19 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import java.io.IOException;
 import java.nio.file.Path;
 
-public class InvoicingPdfImage {
+public class PdfImage {
 
     private final PDPageContentStream cs;
     private final PDImageXObject image;
     private final PdfDimensions dimensions;
 
-    public static InvoicingPdfImageBuilder builder() {
-        return new InvoicingPdfImageBuilder();
+    public static PdfImageBuilder builder() {
+        return new PdfImageBuilder();
     }
 
-    public InvoicingPdfImage(PDDocument doc, PDPageContentStream cs, Path imagePath, PdfDimensions dimensions) throws IOException {
+    public PdfImage(PDDocument doc, PDPageContentStream cs, Path imagePath, PdfDimensions dimensions) throws IOException {
         this.cs = cs;
-        this.dimensions = PdfDimensions.calculateDimensions(dimensions);
+        this.dimensions = dimensions;
         this.image = loadImage(imagePath, doc);
     }
 

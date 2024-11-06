@@ -1,0 +1,28 @@
+@startuml
+skinparam nodesep 50
+skinparam ranksep 50
+skinparam class {
+  BackgroundColor<<interface>> #ffccff
+  BackgroundColor<<abstract>> #ccccff
+}
+
+interface PdfDocumentGenerator {
+    + generate() : PDDocument
+}
+abstract class PdfBaseTemplateGenerator implements PdfDocumentGenerator {
+    ...
+    + generate() : PDDocument
+    # generateContent()
+    {method} ...
+}
+class PdfBaseTemplateGeneratorDEde extends PdfBaseTemplateGenerator {
+    ...
+    + generate() : PDDocument
+    # generateContent()
+    {method} ...
+}
+
+PdfBaseTemplateGeneratorDEde ...> PdfImage : uses
+PdfBaseTemplateGeneratorDEde ...> PdfText : uses
+PdfBaseTemplateGeneratorDEde ...> PdfLine : uses
+@enduml
