@@ -7,12 +7,18 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import java.io.IOException;
 import java.nio.file.Path;
 
-public class InvoicingPdfTemplateImage {
+public class InvoicingPdfImage {
 
+    private final PDPageContentStream cs;
     private final PDImageXObject image;
     private final PdfDimensions dimensions;
 
-    public InvoicingPdfTemplateImage(PDDocument doc, Path imagePath, PdfDimensions dimensions) throws IOException {
+    public static InvoicingPdfImageBuilder builder() {
+        return new InvoicingPdfImageBuilder();
+    }
+
+    public InvoicingPdfImage(PDDocument doc, PDPageContentStream cs, Path imagePath, PdfDimensions dimensions) throws IOException {
+        this.cs = cs;
         this.dimensions = PdfDimensions.calculateDimensions(dimensions);
         this.image = loadImage(imagePath, doc);
     }
@@ -21,7 +27,7 @@ public class InvoicingPdfTemplateImage {
         return PDImageXObject.createFromFile(imagePath.toAbsolutePath().toString(), doc);
     }
 
-    public void draw(PDPageContentStream cs) throws IOException {
+    public void draw() throws IOException {
         cs.drawImage(image, dimensions.x(), dimensions.y(), dimensions.width(), dimensions.height());
     }
 }

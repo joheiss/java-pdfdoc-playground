@@ -7,9 +7,9 @@ import java.io.IOException;
 
 public class InvoicingPdfText {
 
-    private PDPageContentStream cs;
-    private String text;
-    private PdfDimensions dimensions;
+    private final PDPageContentStream cs;
+    private final String text;
+    private final PdfDimensions dimensions;
     private PDType1Font font = null;
     private float[] color = null;
 
@@ -33,13 +33,13 @@ public class InvoicingPdfText {
         this.dimensions = PdfDimensions.calculateDimensions(dimensions);
     }
 
-    public InvoicingPdfText() {}
-
     public void printText() throws IOException {
+        cs.beginText();
         if (font != null) cs.setFont(font, dimensions.height());
         if (color != null) cs.setNonStrokingColor(this.color[0], this.color[1], this.color[2]);
         cs.newLineAtOffset(dimensions.x(), dimensions.y());
         cs.showText(text);
+        cs.endText();
     }
 
 

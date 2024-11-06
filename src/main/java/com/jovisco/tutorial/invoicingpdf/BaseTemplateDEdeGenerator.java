@@ -10,7 +10,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.Calendar;
 
-public class BaseTemplateDEdeGenerator {
+public class BaseTemplateDEdeGenerator implements InvoicingPdfGenerator {
 
     private final static String HEADER_FILENAME = "jovisco-letter-head.png";
     private final static float HEADER_WIDTH = 226.4f;
@@ -23,41 +23,24 @@ public class BaseTemplateDEdeGenerator {
     private final static String FOOTER_FILENAME = "jovisco-letter-foot.png";
 
     private final String filePath;
+    private PDDocument template;
+    private PDPage page;
+    private PDPageContentStream cs;
 
     public BaseTemplateDEdeGenerator(String filePath) {
         this.filePath = filePath;
     }
 
+    @Override
     public PDDocument generate() {
 
         try (var template = new PDDocument()) {
-            // prepare meta information
-            fillMetaInformation(template);
-
-            // create and add page to document
+            this.template = template;
+            fillMetaInformation();
             var page = new PDPage(PDRectangle.A4);
+            this.page = page;
             template.addPage(page);
-
-            // prepare content for template
-            try (var cs = new PDPageContentStream(template, page)) {
-                // draw header image
-                var headerImage = new InvoicingPdfTemplateImage(
-                        template,
-                        Paths.get(ClassLoader.getSystemResource(HEADER_FILENAME).toURI()),
-                        new PdfDimensions(70.0f, 17.0f, HEADER_WIDTH, HEADER_HEIGHT));
-                headerImage.draw(cs);
-                // draw address line image
-                var addressLineImage = new InvoicingPdfTemplateImage(template,
-                        Paths.get(ClassLoader.getSystemResource(ADDRESS_LINE_FILENAME).toURI()),
-                        new PdfDimensions(25.0f, 54.0f, ADDRESS_LINE_WIDTH, ADDRESS_LINE_HEIGHT));
-                addressLineImage.draw(cs);
-                // draw footer image
-                var footerImage = new InvoicingPdfTemplateImage(
-                        template,
-                        Paths.get(ClassLoader.getSystemResource(FOOTER_FILENAME).toURI()),
-                        new PdfDimensions(25.0f, 282.0f, FOOTER_WIDTH, FOOTER_HEIGHT));
-                footerImage.draw(cs);
-            }
+            generateContent();
             template.save(filePath);
             return template;
         } catch (IOException | URISyntaxException e) {
@@ -65,7 +48,47 @@ public class BaseTemplateDEdeGenerator {
         }
     }
 
-    private void fillMetaInformation(PDDocument template) {
+    private void generateContent() throws IOException, URISyntaxException {
+
+        try (var cs = new PDPageContentStream(template, page)) {
+            this.cs = cs;
+            generateHeaderImage();
+            generateAddressLineImage();
+            generateFooterImage();
+        }
+    }
+
+    private void generateHeaderImage() throws IOException, URISyntaxException {
+        InvoicingPdfImage.builder()
+                .document(template)
+                .contentStream(cs)
+                .dimensions(new PdfDimensions(70.0f, 17.0f, HEADER_WIDTH, HEADER_HEIGHT))
+                .imagePath(Paths.get(ClassLoader.getSystemResource(HEADER_FILENAME).toURI()))
+                .build()
+                .draw();
+    }
+    
+    private void generateAddressLineImage() throws IOException, URISyntaxException {
+        InvoicingPdfImage.builder()
+                .document(template)
+                .contentStream(cs)
+                .dimensions(new PdfDimensions(25.0f, 54.0f,  ADDRESS_LINE_WIDTH, ADDRESS_LINE_HEIGHT))
+                .imagePath(Paths.get(ClassLoader.getSystemResource(ADDRESS_LINE_FILENAME).toURI()))
+                .build()
+                .draw();
+    }
+
+    private void generateFooterImage() throws IOException, URISyntaxException {
+        InvoicingPdfImage.builder()
+                .document(template)
+                .contentStream(cs)
+                .dimensions(new PdfDimensions(25.0f, 282.0f, FOOTER_WIDTH, FOOTER_HEIGHT))
+                .imagePath(Paths.get(ClassLoader.getSystemResource(FOOTER_FILENAME).toURI()))
+                .build()
+                .draw();
+    }
+
+    private void fillMetaInformation() {
 
         var now = Calendar.getInstance();
 
@@ -79,7 +102,8 @@ public class BaseTemplateDEdeGenerator {
         metadata.setProducer("PDFBox");
     }
 
-    public boolean templateExists(String filePath) {
+    @Override
+    public boolean documentExists(String filePath) {
         return Paths.get(filePath).toFile().exists();
     }
 }
