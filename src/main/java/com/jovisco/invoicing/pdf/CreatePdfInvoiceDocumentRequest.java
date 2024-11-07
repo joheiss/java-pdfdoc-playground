@@ -1,16 +1,18 @@
 package com.jovisco.invoicing.pdf;
 
+import java.util.List;
+
 public record CreatePdfInvoiceDocumentRequest(
         String invoiceId,
         String formattedInvoiceDate,
         String customerId,
-        String[] addressLines,
+        List<String> addressLines,
         String billingPeriod,
         String formattedTotalNetAmount,
         String formattedTotalVatAmount,
         String formattedTotalGrossAmount,
-        CreatePdfInvoiceItemRequest[] items,
+        List<CreatePdfInvoiceItemRequest> items,
         String totalsHeader,
         String paymentTerms,
-        String[] optionalInvoiceTexts)
+        List<String> optionalInvoiceTexts)
 {}

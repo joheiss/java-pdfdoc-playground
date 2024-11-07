@@ -3,10 +3,12 @@ package com.jovisco.invoicing.pdf;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
+import java.util.List;
+
 public class PdfTextBlockBuilder {
 
     private PDPageContentStream contentStream;
-    private String[] textLines;
+    private List<String> textLines;
     private PdfDimensions dimensions;
     private PDType1Font font;
     private int[] colorRGB;
@@ -24,7 +26,7 @@ public class PdfTextBlockBuilder {
         return this;
     }
 
-    PdfTextBlockBuilder textLines(String[] textLines) {
+    PdfTextBlockBuilder textLines(List<String> textLines) {
         this.textLines = textLines;
         return this;
     }

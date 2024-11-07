@@ -1,14 +1,17 @@
 package com.jovisco.invoicing.pdf;
 
 
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class AppTest {
 
@@ -32,15 +35,32 @@ class AppTest {
             var template = generator.generate();
             assertNotNull(template);
         }
+
+        @Test
+        @DisplayName("should be accessible")
+        void should_be_accessible() {
+            try (var doc = Loader.loadPDF(new File("target/test-basetemplate.pdf"))) {
+                var pdfStripper = new PDFTextStripper();
+                //Retrieving text from PDF document
+                var text = pdfStripper.getText(doc);
+                System.out.println("Base Template Text Content: \n" + text);
+                // contains at least a line feed
+                assertFalse(text.isEmpty());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @Nested
     @DisplayName("Test Invoice Template")
     class InvoiceTemplateTests {
 
+        CreatePdfInvoiceTemplateRequest request = makePdfInvoiceTemplateRequest();
+
         @Test
         @DisplayName("should create the invoice template")
-        void shouldCreateBInvoiceTemplate() throws IOException {
+        void shouldCreateInvoiceTemplate() {
             var request = makePdfInvoiceTemplateRequest();
             var generator = new PdfInvoiceTemplateGeneratorDEde(
                     request,
@@ -49,22 +69,97 @@ class AppTest {
             var template = generator.generate();
             assertNotNull(template);
         }
+
+        @Test
+        @DisplayName("should be accessible")
+        void should_be_accessible() {
+            try (var doc = Loader.loadPDF(new File("target/test-invoicetemplate.pdf"))) {
+                var pdfStripper = new PDFTextStripper();
+                //Retrieving text from PDF document
+                var text = pdfStripper.getText(doc);
+                // contains at least the title, the reference block, and the items header
+                assertFalse(text.isEmpty());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        @Test
+        @DisplayName("should contain predefined text blocks")
+        void should_contain_predefined_text_blocks() {
+            try (var doc = Loader.loadPDF(new File("target/test-invoicetemplate.pdf"))) {
+                var pdfStripper = new PDFTextStripper();
+                //Retrieving text from PDF document
+                var text = pdfStripper.getText(doc);
+                // contains at least the title, the reference block, and the items header
+                assertFalse(text.isEmpty());
+                assertTrue(text.contains(request.title()));
+                assertTrue(text.contains(request.referenceTitle()));
+                assertTrue(text.contains(request.customerIdLabel()));
+                assertTrue(text.contains(request.invoiceIdLabel()));
+                assertTrue(text.contains(request.invoiceDateLabel()));
+                assertTrue(text.contains("Pos"));
+                assertTrue(text.contains("Menge"));
+                assertTrue(text.contains("Beschreibung"));
+                assertTrue(text.contains("Einzelpreis"));
+                assertTrue(text.contains("Gesamtpreis"));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @Nested
     @DisplayName("Test Invoice Document")
     class InvoiceDocumentTests {
 
+        CreatePdfInvoiceDocumentRequest request = makePdfInvoiceDocumentRequest();
+
         @Test
         @DisplayName("should create a invoice document")
         void shouldCreateInvoiceDocument() {
-            var request = makePdfInvoiceDocumentRequest();
             var generator = new PdfInvoiceDocumentGeneratorDEde(
                     request,
                     "target/test-invoicetemplate.pdf",
                     "target/test-invoice-" + request.invoiceId() + ".pdf");
             var template = generator.generate();
             assertNotNull(template);
+        }
+
+        @Test
+        @DisplayName("should be accessible")
+        void should_be_accessible() {
+            try (var doc = Loader.loadPDF(new File("target/test-R" + request.invoiceId() + ".pdf"))) {
+                var pdfStripper = new PDFTextStripper();
+                //Retrieving text from PDF document
+                var text = pdfStripper.getText(doc);
+                // contains address lines, billing period,reference ids, item lines, totals, and payment terms
+                assertFalse(text.isEmpty());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        @Test
+        @DisplayName("should contain invoice data")
+        void should_contain_invoice_data() {
+            try (var doc = Loader.loadPDF(new File("target/test-R" + request.invoiceId() + ".pdf"))) {
+                var pdfStripper = new PDFTextStripper();
+                //Retrieving text from PDF document
+                var text = pdfStripper.getText(doc);
+                // contains address lines, billing period,reference ids, item lines, totals, and payment terms                assertFalse(text.isEmpty());
+                assertTrue(text.contains(request.addressLines().getFirst()));
+                assertTrue(text.contains("Leistungszeitraum"));
+                assertTrue(text.contains(request.invoiceId()));
+                assertTrue(text.contains(request.customerId()));
+                assertTrue(text.contains(request.formattedInvoiceDate()));
+                assertTrue(text.contains(request.items().getFirst().description()));
+                assertTrue(text.contains(request.formattedTotalGrossAmount()));
+                assertTrue(text.contains(request.paymentTerms()));
+                assertTrue(!request.optionalInvoiceTexts().isEmpty() &&
+                        text.contains(request.optionalInvoiceTexts().getFirst()));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -105,12 +200,12 @@ class AppTest {
                 "5222",
                 "2.11.2024",
                 "4711",
-                new String[]{"Jovisco AG", "Kapitalstr. 123", "", "12345 Berlin"},
+                 List.of("Jovisco AG", "Kapitalstr. 123", "", "12345 Berlin"),
                 "Leistungszeitraum Oktober 2024",
                 "12.345,67 €",
                 "2.345,67 €",
                 "15.678,90 €",
-                new CreatePdfInvoiceItemRequest[]{
+                 List.of(
                         new CreatePdfInvoiceItemRequest(
                                 "1",
                                 "123,5",
@@ -135,14 +230,14 @@ class AppTest {
                                 "Gefahrene Km",
                                 "0,60 €",
                                 "488,00 €")
-                },
+                ),
                 totalsHeader,
                 "Zahlbar innerhalb von 30 Tagen ohne Abzug",
-                new String[]{
+                List.of(
                         "Bitte beachten sie den geänderten Mehrwertsteuersatz von nun 25%.",
                         "Der neue Mehrwertsteuersatz wird auf dieser Rechnung, entsprechend",
                         "dem gesetzlichen Stichtag, bereits angewendet."
-                }
+                )
         );
     }
 }

@@ -4,11 +4,12 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
 import java.io.IOException;
+import java.util.List;
 
 public class PdfTextBlock {
 
     private final PDPageContentStream cs;
-    private final String[] textLines;
+    private final List<String> textLines;
     private final PdfDimensions dimensions;
     private PDType1Font font = null;
     private float[] color = null;
@@ -18,19 +19,19 @@ public class PdfTextBlock {
         return new PdfTextBlockBuilder();
     }
 
-    public PdfTextBlock(PDPageContentStream cs, String[] textLines, PdfDimensions dimensions, PDType1Font font,
+    public PdfTextBlock(PDPageContentStream cs, List<String> textLines, PdfDimensions dimensions, PDType1Font font,
                         int[] color, float leading) {
         this(cs, textLines, dimensions, font);
         if (color != null) this.color = new float[]{color[0]/255.0f, color[1]/255.0f, color[2]/255.0f};
         if (leading > 0) this.leading = leading;
     }
 
-    public PdfTextBlock(PDPageContentStream cs, String[] textLines, PdfDimensions dimensions, PDType1Font font) {
+    public PdfTextBlock(PDPageContentStream cs, List<String> textLines, PdfDimensions dimensions, PDType1Font font) {
         this(cs, textLines, dimensions);
         this.font = font;
     }
 
-    public PdfTextBlock(PDPageContentStream cs, String[] textLines, PdfDimensions dimensions) {
+    public PdfTextBlock(PDPageContentStream cs, List<String> textLines, PdfDimensions dimensions) {
         this.cs = cs;
         this.textLines = textLines;
         this.dimensions = dimensions;
