@@ -43,8 +43,8 @@ class PdfDimensions {
     {field} - y : float
     {field} - width : float
     {field} - height : float
-    {static} + ofA4mm(float x, float y, float width, float height)
-    {static} + ofA4(float x, float y, float width, float height)
+    {static} + ofA4mm(x, y, width, height) : PdfDimensions
+    {static} + ofA4(x, y, width, height) : PdfDimensions
 }
 PdfLineBuilder --> PdfLine : creates
 PdfImageBuilder --> PdfImage : creates
