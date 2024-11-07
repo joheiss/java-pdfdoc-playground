@@ -1,13 +1,16 @@
 package com.jovisco.invoicing.pdf;
 
+import java.util.List;
+import java.util.Map;
+
 public class PdfInvoiceTemplateGeneratorDEde extends PdfInvoiceTemplateGenerator {
 
     public PdfInvoiceTemplateGeneratorDEde(
-            CreatePdfInvoiceTemplateRequest request,
+            Map<String, List<String>> requestMap,
             String baseTemplateFilePath,
             String targetFilePath)
     {
-        super(request, baseTemplateFilePath, targetFilePath);
+        super(requestMap, baseTemplateFilePath, targetFilePath);
     }
 
     protected void fillMetaInformation() {
