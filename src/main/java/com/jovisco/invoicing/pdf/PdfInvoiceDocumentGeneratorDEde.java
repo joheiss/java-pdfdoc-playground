@@ -6,7 +6,7 @@ import java.util.Map;
 public class PdfInvoiceDocumentGeneratorDEde extends PdfInvoiceDocumentGenerator {
 
     public PdfInvoiceDocumentGeneratorDEde(
-            Map<String, List<Object>> requestMap,
+            RequestMap requestMap,
             String invoiceTemplateFilePath,
             String targetFilePath) {
         super(requestMap, invoiceTemplateFilePath, targetFilePath);

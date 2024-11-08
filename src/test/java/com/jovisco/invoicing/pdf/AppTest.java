@@ -58,7 +58,7 @@ class AppTest {
     @DisplayName("Test Invoice Template")
     class InvoiceTemplateTests {
 
-        Map<String, List<String>> requestMap = makePdfInvoiceTemplateRequest();
+        RequestMap requestMap = new RequestMap(makeTemplateRequestMap());
 
         @Test
         @DisplayName("should create the invoice template")
@@ -94,16 +94,16 @@ class AppTest {
                 var text = pdfStripper.getText(doc);
                 // contains at least the title, the reference block, and the items header
                 assertFalse(text.isEmpty());
-                assertTrue(text.contains(requestMap.get(PdfInvoiceTemplateRequest.TITLE).getFirst()));
-                assertTrue(text.contains(requestMap.get(PdfInvoiceTemplateRequest.REF_TITLE).getFirst()));
-                assertTrue(text.contains(requestMap.get(PdfInvoiceTemplateRequest.CUSTOMER_ID_LBL).getFirst()));
-                assertTrue(text.contains(requestMap.get(PdfInvoiceTemplateRequest.INVOICE_ID_LBL).getFirst()));
-                assertTrue(text.contains(requestMap.get(PdfInvoiceTemplateRequest.INVOICE_DATE_LBL).getFirst()));
-                assertTrue(text.contains(requestMap.get(PdfInvoiceTemplateRequest.ITEM_ID_HDR).getFirst()));
-                assertTrue(text.contains(requestMap.get(PdfInvoiceTemplateRequest.ITEM_QTY_HDR).getFirst()));
-                assertTrue(text.contains(requestMap.get(PdfInvoiceTemplateRequest.ITEM_DESC_HDR).getFirst()));
-                assertTrue(text.contains(requestMap.get(PdfInvoiceTemplateRequest.ITEM_UNIT_NET_AMNT_HDR).getFirst()));
-                assertTrue(text.contains(requestMap.get(PdfInvoiceTemplateRequest.ITEM_TOTAL_NET_AMNT_HDR).getFirst()));
+                assertTrue(text.contains(requestMap.get(RequestMap.TITLE)));
+                assertTrue(text.contains(requestMap.get(RequestMap.REF_TITLE)));
+                assertTrue(text.contains(requestMap.get(RequestMap.CUSTOMER_ID_LBL)));
+                assertTrue(text.contains(requestMap.get(RequestMap.INVOICE_ID_LBL)));
+                assertTrue(text.contains(requestMap.get(RequestMap.INVOICE_DATE_LBL)));
+                assertTrue(text.contains(requestMap.get(RequestMap.ITEM_ID_HDR)));
+                assertTrue(text.contains(requestMap.get(RequestMap.ITEM_QTY_HDR)));
+                assertTrue(text.contains(requestMap.get(RequestMap.ITEM_DESC_HDR)));
+                assertTrue(text.contains(requestMap.get(RequestMap.ITEM_UNIT_NET_AMNT_HDR)));
+                assertTrue(text.contains(requestMap.get(RequestMap.ITEM_TOTAL_NET_AMNT_HDR)));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -114,8 +114,8 @@ class AppTest {
     @DisplayName("Test Invoice Document")
     class InvoiceDocumentTests {
 
-        Map<String, List<Object>> requestMap = makePdfInvoiceDocumentRequest();
-        String invoiceId = String.valueOf(requestMap.get(PdfInvoiceDocumentRequest.INVOICE_ID).getFirst());
+        RequestMap requestMap = new RequestMap(makeDocumentRequestMap());
+        String invoiceId = requestMap.get(RequestMap.INVOICE_ID);
 
         @Test
         @DisplayName("should create a invoice document")
@@ -149,17 +149,19 @@ class AppTest {
                 //Retrieving text from PDF document
                 var text = pdfStripper.getText(doc);
                 // contains address lines, billing period,reference ids, item lines, totals, and payment terms
-                var firstAddressLine = String.valueOf(requestMap.get(PdfInvoiceDocumentRequest.ADDRESS_LINES).getFirst());
+                var firstAddressLine = requestMap.getList(RequestMap.ADDRESS_LINES).getFirst();
                 assertTrue(text.contains(firstAddressLine));
-                assertTrue(text.contains(String.valueOf(requestMap.get(PdfInvoiceDocumentRequest.BILLING_PERIOD).getFirst())));
+                assertTrue(text.contains(requestMap.get(RequestMap.BILLING_PERIOD)));
                 assertTrue(text.contains(invoiceId));
-                assertTrue(text.contains(String.valueOf(requestMap.get(PdfInvoiceDocumentRequest.CUSTOMER_ID).getFirst())));
-                assertTrue(text.contains(String.valueOf(requestMap.get(PdfInvoiceDocumentRequest.INVOICE_DATE).getFirst())));
-                Map<String, String> itemsMap = (Map<String, String>)requestMap.get(PdfInvoiceDocumentRequest.ITEMS).getFirst();
-                assertTrue(text.contains(itemsMap.get(PdfInvoiceItemRequest.ITEM_DESC)));
-                assertTrue(text.contains(String.valueOf(requestMap.get(PdfInvoiceDocumentRequest.TOTAL_GROSS_AMNT).getFirst())));
-                assertTrue(text.contains(String.valueOf(requestMap.get(PdfInvoiceDocumentRequest.PAYMENT_TERMS).getFirst())));
-                var firstOptionalInvoiceText = String.valueOf(requestMap.get(PdfInvoiceDocumentRequest.OPT_INVOICE_TEXTS).getFirst());
+                assertTrue(text.contains(requestMap.get(RequestMap.CUSTOMER_ID)));
+                assertTrue(text.contains(requestMap.get(RequestMap.INVOICE_DATE)));
+                var firstItem = requestMap.getItems().getFirst();
+                assertTrue(text.contains(firstItem.get(RequestMap.ITEM_ID)));
+                assertTrue(text.contains(firstItem.get(RequestMap.ITEM_QTY)));
+                assertTrue(text.contains(firstItem.get(RequestMap.ITEM_DESC)));
+                assertTrue(text.contains(requestMap.get(RequestMap.TOTAL_GROSS_AMNT)));
+                assertTrue(text.contains(requestMap.get(RequestMap.PAYMENT_TERMS)));
+                var firstOptionalInvoiceText = requestMap.getList(RequestMap.OPT_INVOICE_TEXTS).getFirst();
                 assertTrue(firstOptionalInvoiceText != null && text.contains(firstOptionalInvoiceText));
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -167,98 +169,72 @@ class AppTest {
         }
     }
 
-    private static Map<String, List<String>> makePdfInvoiceTemplateRequest() {
-        var requestMap = new HashMap<String, List<String>>(15);
+    private static Map<String, List<Object>> makeTemplateRequestMap() {
+        var requestMap = new HashMap<String, List<Object>>(15);
 
-        requestMap.put(PdfInvoiceTemplateRequest.TITLE, List.of("Rechnung"));
-        requestMap.put(PdfInvoiceTemplateRequest.REF_TITLE, List.of("Bitte bei Zahlung angeben:"));
-        requestMap.put(PdfInvoiceTemplateRequest.CUSTOMER_ID_LBL, List.of("Kd.Nr."));
-        requestMap.put(PdfInvoiceTemplateRequest.INVOICE_ID_LBL, List.of("Re.Nr."));
-        requestMap.put(PdfInvoiceTemplateRequest.INVOICE_DATE_LBL, List.of("Datum"));
-        requestMap.put(PdfInvoiceTemplateRequest.ITEM_ID_HDR, List.of("Pos"));
-        requestMap.put(PdfInvoiceTemplateRequest.ITEM_QTY_HDR, List.of("Menge"));
-        requestMap.put(PdfInvoiceTemplateRequest.ITEM_DESC_HDR, List.of("Beschreibung"));
-        requestMap.put(PdfInvoiceTemplateRequest.ITEM_UNIT_NET_AMNT_HDR, List.of("Einzelpreis"));
-        requestMap.put(PdfInvoiceTemplateRequest.ITEM_TOTAL_NET_AMNT_HDR, List.of("Gesamtpreis"));
+        requestMap.put(RequestMap.TITLE, List.of("Rechnung"));
+        requestMap.put(RequestMap.REF_TITLE, List.of("Bitte bei Zahlung angeben:"));
+        requestMap.put(RequestMap.CUSTOMER_ID_LBL, List.of("Kd.Nr."));
+        requestMap.put(RequestMap.INVOICE_ID_LBL, List.of("Re.Nr."));
+        requestMap.put(RequestMap.INVOICE_DATE_LBL, List.of("Datum"));
+        requestMap.put(RequestMap.ITEM_ID_HDR, List.of("Pos"));
+        requestMap.put(RequestMap.ITEM_QTY_HDR, List.of("Menge"));
+        requestMap.put(RequestMap.ITEM_DESC_HDR, List.of("Beschreibung"));
+        requestMap.put(RequestMap.ITEM_UNIT_NET_AMNT_HDR, List.of("Einzelpreis"));
+        requestMap.put(RequestMap.ITEM_TOTAL_NET_AMNT_HDR, List.of("Gesamtpreis"));
 
         return requestMap;
     }
 
-    private static Map<String, List<Object>> makePdfInvoiceDocumentRequest() {
-        Map<String, List<Object>> requestMap = new HashMap<>();
-        requestMap.put(PdfInvoiceDocumentRequest.INVOICE_ID, List.of("5222"));
-        requestMap.put(PdfInvoiceDocumentRequest.INVOICE_DATE, List.of("2.11.2024"));
-        requestMap.put(PdfInvoiceDocumentRequest.CUSTOMER_ID, List.of("4711"));
-        requestMap.put(PdfInvoiceDocumentRequest.ADDRESS_LINES, List.of("Jovisco AG", "Kapitalstr. 123", "", "12345 Berlin"));
-        requestMap.put(PdfInvoiceDocumentRequest.BILLING_PERIOD, List.of("Leistungszeitraum Oktober 2024"));
-//        requestMap.put(PdfInvoiceDocumentRequest.ITEMS,
-//            List.of(
-//                    new PdfInvoiceItemRequest(
-//                            "1",
-//                            "123,5",
-//                            "Projektstunden im Projekt \"Rettet die Welt\"",
-//                            "123,45 €",
-//                            "12.345,67 €"),
-//                    new PdfInvoiceItemRequest(
-//                            "2",
-//                            "23",
-//                            "Reisestunden im Projekt \"Rettet die Welt\"",
-//                            "66,18 €",
-//                            "1.234,56 €"),
-//                    new PdfInvoiceItemRequest(
-//                            "3",
-//                            "2",
-//                            "Übernachtungen im Hotel",
-//                            "150,00 €",
-//                            "300,00 €"),
-//                    new PdfInvoiceItemRequest(
-//                            "4",
-//                            "765",
-//                            "Gefahrene Km",
-//                            "0,60 €",
-//                            "488,00 €")
-//            ));
-        requestMap.put(PdfInvoiceDocumentRequest.TOTAL_NET_AMNT_HDR, List.of("Nettobetrag"));
-        requestMap.put(PdfInvoiceDocumentRequest.TOTAL_VAT_AMNT_HDR, List.of("19% MwSt"));
-        requestMap.put(PdfInvoiceDocumentRequest.TOTAL_GROSS_AMNT_HDR, List.of("Bruttobetrag"));
-        requestMap.put(PdfInvoiceDocumentRequest.TOTAL_NET_AMNT, List.of("12.345,67 €"));
-        requestMap.put(PdfInvoiceDocumentRequest.TOTAL_VAT_AMNT, List.of("2.345,67 €"));
-        requestMap.put(PdfInvoiceDocumentRequest.TOTAL_GROSS_AMNT, List.of("15.678,90 €"));
-        requestMap.put(PdfInvoiceDocumentRequest.PAYMENT_TERMS, List.of("Zahlbar innerhalb von 30 Tagen ohne Abzug"));
-        requestMap.put(PdfInvoiceDocumentRequest.OPT_INVOICE_TEXTS, List.of(
+    private static Map<String, List<Object>> makeDocumentRequestMap() {
+        var requestMap = new HashMap<String, List<Object>>(25);
+
+        requestMap.put(RequestMap.INVOICE_ID, List.of("5222"));
+        requestMap.put(RequestMap.INVOICE_DATE, List.of("2.11.2024"));
+        requestMap.put(RequestMap.CUSTOMER_ID, List.of("4711"));
+        requestMap.put(RequestMap.ADDRESS_LINES, List.of("Jovisco AG", "Kapitalstr. 123", "", "12345 Berlin"));
+        requestMap.put(RequestMap.BILLING_PERIOD, List.of("Leistungszeitraum Oktober 2024"));
+        requestMap.put(RequestMap.TOTAL_NET_AMNT_HDR, List.of("Nettobetrag"));
+        requestMap.put(RequestMap.TOTAL_VAT_AMNT_HDR, List.of("19% MwSt"));
+        requestMap.put(RequestMap.TOTAL_GROSS_AMNT_HDR, List.of("Bruttobetrag"));
+        requestMap.put(RequestMap.TOTAL_NET_AMNT, List.of("12.345,67 €"));
+        requestMap.put(RequestMap.TOTAL_VAT_AMNT, List.of("2.345,67 €"));
+        requestMap.put(RequestMap.TOTAL_GROSS_AMNT, List.of("15.678,90 €"));
+        requestMap.put(RequestMap.PAYMENT_TERMS, List.of("Zahlbar innerhalb von 30 Tagen ohne Abzug"));
+        requestMap.put(RequestMap.OPT_INVOICE_TEXTS, List.of(
                 "Bitte beachten sie den geänderten Mehrwertsteuersatz von nun 25%.",
                 "Der neue Mehrwertsteuersatz wird auf dieser Rechnung, entsprechend",
                 "dem gesetzlichen Stichtag, bereits angewendet."));
 
-        requestMap.put(PdfInvoiceDocumentRequest.ITEMS,
+        requestMap.put(RequestMap.ITEMS,
                 List.of(
                     Map.of(
-                            PdfInvoiceItemRequest.ITEM_ID, "1",
-                            PdfInvoiceItemRequest.ITEM_QTY, "123,5",
-                            PdfInvoiceItemRequest.ITEM_DESC, "Projektstunden im Projekt \"Rettet die Welt\"",
-                            PdfInvoiceItemRequest.ITEM_UNIT_NET_AMNT, "123,45 €",
-                            PdfInvoiceItemRequest.ITEM_TOTAL_NET_AMNT, "12.345,67 €"
+                            RequestMap.ITEM_ID, "1",
+                            RequestMap.ITEM_QTY, "123,5",
+                            RequestMap.ITEM_DESC, "Projektstunden im Projekt \"Rettet die Welt\"",
+                            RequestMap.ITEM_UNIT_NET_AMNT, "123,45 €",
+                            RequestMap.ITEM_TOTAL_NET_AMNT, "12.345,67 €"
                     ),
                     Map.of(
-                            PdfInvoiceItemRequest.ITEM_ID, "2",
-                            PdfInvoiceItemRequest.ITEM_QTY, "23",
-                            PdfInvoiceItemRequest.ITEM_DESC, "Reisestunden im Projekt \"Rettet die Welt\"",
-                            PdfInvoiceItemRequest.ITEM_UNIT_NET_AMNT, "66,18 €",
-                            PdfInvoiceItemRequest.ITEM_TOTAL_NET_AMNT, "1.234,56 €"
+                            RequestMap.ITEM_ID, "2",
+                            RequestMap.ITEM_QTY, "23",
+                            RequestMap.ITEM_DESC, "Reisestunden im Projekt \"Rettet die Welt\"",
+                            RequestMap.ITEM_UNIT_NET_AMNT, "66,18 €",
+                            RequestMap.ITEM_TOTAL_NET_AMNT, "1.234,56 €"
                     ),
                     Map.of(
-                            PdfInvoiceItemRequest.ITEM_ID, "3",
-                            PdfInvoiceItemRequest.ITEM_QTY, "2",
-                            PdfInvoiceItemRequest.ITEM_DESC, "Übernachtungen im Hotel",
-                            PdfInvoiceItemRequest.ITEM_UNIT_NET_AMNT, "150,00 €",
-                            PdfInvoiceItemRequest.ITEM_TOTAL_NET_AMNT, "300,00 €"
+                            RequestMap.ITEM_ID, "3",
+                            RequestMap.ITEM_QTY, "2",
+                            RequestMap.ITEM_DESC, "Übernachtungen im Hotel",
+                            RequestMap.ITEM_UNIT_NET_AMNT, "150,00 €",
+                            RequestMap.ITEM_TOTAL_NET_AMNT, "300,00 €"
                     ),
                     Map.of(
-                            PdfInvoiceItemRequest.ITEM_ID, "4",
-                            PdfInvoiceItemRequest.ITEM_QTY, "765",
-                            PdfInvoiceItemRequest.ITEM_DESC, "Gefahrene Km",
-                            PdfInvoiceItemRequest.ITEM_UNIT_NET_AMNT, "0,60 €",
-                            PdfInvoiceItemRequest.ITEM_TOTAL_NET_AMNT, "488,00 €"
+                            RequestMap.ITEM_ID, "4",
+                            RequestMap.ITEM_QTY, "765",
+                            RequestMap.ITEM_DESC, "Gefahrene Km",
+                            RequestMap.ITEM_UNIT_NET_AMNT, "0,60 €",
+                            RequestMap.ITEM_TOTAL_NET_AMNT, "488,00 €"
                     )
                 ));
 

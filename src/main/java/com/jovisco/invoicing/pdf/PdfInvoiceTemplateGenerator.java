@@ -21,7 +21,7 @@ public class PdfInvoiceTemplateGenerator implements PdfDocumentGenerator {
     protected final static float LINE_WIDTH = 163.0f * PdfDimensions.PAGE_WIDTH_FACTOR;
     protected final static float REFERENCE_UNDERLINE_WIDTH = 38.0f * PdfDimensions.PAGE_WIDTH_FACTOR;
 
-    protected final Map<String, List<String>> requestMap;
+    protected final RequestMap requestMap;
     protected final String baseTemplateFilePath;
     protected final String targetFilePath;
     protected final PDType1Font font = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
@@ -31,7 +31,7 @@ public class PdfInvoiceTemplateGenerator implements PdfDocumentGenerator {
     protected PDPageContentStream cs;
 
     public PdfInvoiceTemplateGenerator(
-            Map<String, List<String>> requestMap,
+            RequestMap requestMap,
             String baseTemplateFilePath,
             String targetFilePath)
     {
@@ -82,7 +82,7 @@ public class PdfInvoiceTemplateGenerator implements PdfDocumentGenerator {
     protected void generateInvoiceTitle() throws IOException {
         PdfText.builder()
                 .contentStream(cs)
-                .text(requestMap.get(PdfInvoiceTemplateRequest.TITLE).getFirst())
+                .text(requestMap.get(RequestMap.TITLE))
                 .dimensions(PdfDimensions.ofA4mm(26.0f, 92.0f, 40.0f, 24.0f))
                 .font(font)
                 .colorRGB(TEMPLATE_COLOR)
@@ -99,7 +99,7 @@ public class PdfInvoiceTemplateGenerator implements PdfDocumentGenerator {
     protected void printReferenceTitle() throws IOException {
         PdfText.builder()
                 .contentStream(cs)
-                .text(requestMap.get(PdfInvoiceTemplateRequest.REF_TITLE).getFirst())
+                .text(requestMap.get(RequestMap.REF_TITLE))
                 .dimensions(PdfDimensions.ofA4mm(150.0f, 96.0f, 20.0f, 9.0f))
                 .font(font)
                 .build()
@@ -124,7 +124,7 @@ public class PdfInvoiceTemplateGenerator implements PdfDocumentGenerator {
     protected void printInvoiceIdLabel() throws IOException {
         PdfText.builder()
                 .contentStream(cs)
-                .text(requestMap.get(PdfInvoiceTemplateRequest.INVOICE_ID_LBL).getFirst())
+                .text(requestMap.get(RequestMap.INVOICE_ID_LBL))
                 .dimensions(PdfDimensions.ofA4mm(150.0f, 107.0f, 30.0f, 12.0f))
                 .colorRGB(TEMPLATE_COLOR)
                 .build()
@@ -134,7 +134,7 @@ public class PdfInvoiceTemplateGenerator implements PdfDocumentGenerator {
     protected void printCustomerIdLabel() throws IOException {
         PdfText.builder()
                 .contentStream(cs)
-                .text(requestMap.get(PdfInvoiceTemplateRequest.CUSTOMER_ID_LBL).getFirst())
+                .text(requestMap.get(RequestMap.CUSTOMER_ID_LBL))
                 .dimensions(PdfDimensions.ofA4mm(150.0f, 101.0f, 30.0f, 12.0f))
                 .colorRGB(TEMPLATE_COLOR)
                 .build()
@@ -144,7 +144,7 @@ public class PdfInvoiceTemplateGenerator implements PdfDocumentGenerator {
     protected void printInvoiceDateLabel() throws IOException {
         PdfText.builder()
                 .contentStream(cs)
-                .text(requestMap.get(PdfInvoiceTemplateRequest.INVOICE_DATE_LBL).getFirst())
+                .text(requestMap.get(RequestMap.INVOICE_DATE_LBL))
                 .dimensions(PdfDimensions.ofA4mm(150.0f, 113.0f, 30.0f, 12.0f))
                 .colorRGB(TEMPLATE_COLOR)
                 .build()
@@ -177,7 +177,7 @@ public class PdfInvoiceTemplateGenerator implements PdfDocumentGenerator {
         PdfText.builder()
                 .contentStream(cs)
                 .dimensions(PdfDimensions.ofA4mm(26.5f, 126.5f, 10.0f, 9.0f))
-                .text(requestMap.get(PdfInvoiceTemplateRequest.ITEM_ID_HDR).getFirst())
+                .text(requestMap.get(RequestMap.ITEM_ID_HDR))
                 .build()
                 .printText();
     }
@@ -186,7 +186,7 @@ public class PdfInvoiceTemplateGenerator implements PdfDocumentGenerator {
         PdfText.builder()
                 .contentStream(cs)
                 .dimensions(PdfDimensions.ofA4mm(38.5f, 126.5f, 10.0f, 9.0f))
-                .text(requestMap.get(PdfInvoiceTemplateRequest.ITEM_QTY_HDR).getFirst())
+                .text(requestMap.get(RequestMap.ITEM_QTY_HDR))
                 .build()
                 .printText();
     }
@@ -195,7 +195,7 @@ public class PdfInvoiceTemplateGenerator implements PdfDocumentGenerator {
         PdfText.builder()
                 .contentStream(cs)
                 .dimensions(PdfDimensions.ofA4mm(58.0f, 126.5f, 10.0f, 9.0f))
-                .text(requestMap.get(PdfInvoiceTemplateRequest.ITEM_DESC_HDR).getFirst())
+                .text(requestMap.get(RequestMap.ITEM_DESC_HDR))
                 .build()
                 .printText();
     }
@@ -204,7 +204,7 @@ public class PdfInvoiceTemplateGenerator implements PdfDocumentGenerator {
         PdfText.builder()
                 .contentStream(cs)
                 .dimensions(PdfDimensions.ofA4mm(141.0f, 126.5f, 10.0f, 9.0f))
-                .text(requestMap.get(PdfInvoiceTemplateRequest.ITEM_UNIT_NET_AMNT_HDR).getFirst())
+                .text(requestMap.get(RequestMap.ITEM_UNIT_NET_AMNT_HDR))
                 .build()
                 .printText();
     }
@@ -213,7 +213,7 @@ public class PdfInvoiceTemplateGenerator implements PdfDocumentGenerator {
         PdfText.builder()
                 .contentStream(cs)
                 .dimensions(PdfDimensions.ofA4mm(171.0f, 126.5f, 10.0f, 9.0f))
-                .text(requestMap.get(PdfInvoiceTemplateRequest.ITEM_TOTAL_NET_AMNT_HDR).getFirst())
+                .text(requestMap.get(RequestMap.ITEM_TOTAL_NET_AMNT_HDR))
                 .build()
                 .printText();
     }

@@ -10,9 +10,7 @@ import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 import java.util.Map;
 
 public abstract class PdfInvoiceDocumentGenerator implements PdfDocumentGenerator {
@@ -21,7 +19,7 @@ public abstract class PdfInvoiceDocumentGenerator implements PdfDocumentGenerato
     protected static final int[] TEMPLATE_COLOR = {1, 94, 104};
     private final static float LINE_WIDTH = 163.0f * PdfDimensions.PAGE_WIDTH_FACTOR;
 
-    protected final Map<String, List<Object>> requestMap;
+    protected final RequestMap requestMap;
     protected final String invoiceTemplateFilePath;
     protected final String targetFilePath;
     protected final PDType1Font font = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
@@ -33,14 +31,14 @@ public abstract class PdfInvoiceDocumentGenerator implements PdfDocumentGenerato
     protected String invoiceId;
 
     public PdfInvoiceDocumentGenerator(
-            Map<String, List<Object>> requestMap,
+            RequestMap requestMap,
             String invoiceTemplateFilePath,
             String targetFilePath)
     {
         this.requestMap = requestMap;
         this.invoiceTemplateFilePath = invoiceTemplateFilePath;
         this.targetFilePath = targetFilePath;
-        this.invoiceId = String.valueOf(requestMap.get(PdfInvoiceDocumentRequest.INVOICE_ID).getFirst());
+        this.invoiceId = this.requestMap.get(RequestMap.INVOICE_ID);
     }
 
     @Override
@@ -87,13 +85,9 @@ public abstract class PdfInvoiceDocumentGenerator implements PdfDocumentGenerato
 
     protected void generateAddressLines() throws IOException {
 
-        var addressLinesObj = requestMap.get(PdfInvoiceDocumentRequest.ADDRESS_LINES);
-        List<String> addressLines = new ArrayList<>();
-        addressLinesObj.forEach(obj -> addressLines.add(String.valueOf(obj)));
-
         PdfTextBlock.builder()
                 .contentStream(cs)
-                .textLines(addressLines)
+                .textLines(requestMap.getList(RequestMap.ADDRESS_LINES))
                 .font(font)
                 .colorRGB(TEXT_COLOR)
                 .dimensions(PdfDimensions.ofA4mm(26.0f, 58.0f, 250.0f, 12.0f))
@@ -121,7 +115,7 @@ public abstract class PdfInvoiceDocumentGenerator implements PdfDocumentGenerato
     protected void printCustomerId() throws IOException {
         PdfText.builder()
                 .contentStream(cs)
-                .text(String.valueOf(requestMap.get(PdfInvoiceDocumentRequest.CUSTOMER_ID).getFirst()))
+                .text(requestMap.get(RequestMap.CUSTOMER_ID))
                 .dimensions(PdfDimensions.ofA4mm(167.0f, 101.0f, 30.0f, 12.0f))
                 .colorRGB(TEXT_COLOR)
                 .build()
@@ -131,7 +125,7 @@ public abstract class PdfInvoiceDocumentGenerator implements PdfDocumentGenerato
     protected void printInvoiceDate() throws IOException {
         PdfText.builder()
                 .contentStream(cs)
-                .text(String.valueOf(requestMap.get(PdfInvoiceDocumentRequest.INVOICE_DATE).getFirst()))
+                .text(requestMap.get(RequestMap.INVOICE_DATE))
                 .dimensions(PdfDimensions.ofA4mm(167.0f, 113.0f, 30.0f, 12.0f))
                 .colorRGB(TEXT_COLOR)
                 .build()
@@ -142,7 +136,7 @@ public abstract class PdfInvoiceDocumentGenerator implements PdfDocumentGenerato
         PdfText.builder()
                 .contentStream(cs)
                 .dimensions(PdfDimensions.ofA4mm(26.0f, 111.0f, 250.0f, 12.0f))
-                .text(String.valueOf(requestMap.get(PdfInvoiceDocumentRequest.BILLING_PERIOD).getFirst()))
+                .text(requestMap.get(RequestMap.BILLING_PERIOD))
                 .colorRGB(TEXT_COLOR)
                 .build()
                 .printText();
@@ -150,25 +144,19 @@ public abstract class PdfInvoiceDocumentGenerator implements PdfDocumentGenerato
 
     protected void generateItemsBlock() throws IOException {
 
-        // retrieve items from request map
-        List<Map<String, String>> items = new ArrayList<>();
-        var itemsObj = requestMap.get(PdfInvoiceDocumentRequest.ITEMS);
-        itemsObj.forEach(obj -> items.add((Map<String, String>) obj));
-
-        // ... and print the items
         posY = 135.0f;
-        for (var item : items) {
+        for (var item : requestMap.getItems()) {
             generateItem(item);
             posY += 7.0f;
         }
     }
 
     protected void generateItem(Map<String, String> itemMap) throws IOException {
-        printItemId(itemMap.get(PdfInvoiceItemRequest.ITEM_ID));
-        printItemQuantity(itemMap.get(PdfInvoiceItemRequest.ITEM_QTY));
-        printItemDescription(itemMap.get(PdfInvoiceItemRequest.ITEM_DESC));
-        printItemUnitNetAmount(itemMap.get(PdfInvoiceItemRequest.ITEM_UNIT_NET_AMNT));
-        printItemTotalNetAmount(itemMap.get(PdfInvoiceItemRequest.ITEM_TOTAL_NET_AMNT));
+        printItemId(itemMap.get(RequestMap.ITEM_ID));
+        printItemQuantity(itemMap.get(RequestMap.ITEM_QTY));
+        printItemDescription(itemMap.get(RequestMap.ITEM_DESC));
+        printItemUnitNetAmount(itemMap.get(RequestMap.ITEM_UNIT_NET_AMNT));
+        printItemTotalNetAmount(itemMap.get(RequestMap.ITEM_TOTAL_NET_AMNT));
     }
 
     protected void printItemId(String itemId) throws IOException {
@@ -266,7 +254,7 @@ public abstract class PdfInvoiceDocumentGenerator implements PdfDocumentGenerato
         PdfText.builder()
                 .contentStream(cs)
                 .dimensions(PdfDimensions.ofA4mm(40.0f, posY, 20.0f, 9.0f))
-                .text(String.valueOf(requestMap.get(PdfInvoiceDocumentRequest.TOTAL_NET_AMNT_HDR).getFirst()))
+                .text(requestMap.get(RequestMap.TOTAL_NET_AMNT_HDR))
                 .font(font)
                 .colorRGB(TEMPLATE_COLOR)
                 .build()
@@ -277,7 +265,7 @@ public abstract class PdfInvoiceDocumentGenerator implements PdfDocumentGenerato
         PdfText.builder()
                 .contentStream(cs)
                 .dimensions(PdfDimensions.ofA4mm(96.5f, posY, 20.0f, 9.0f))
-                .text(String.valueOf(requestMap.get(PdfInvoiceDocumentRequest.TOTAL_VAT_AMNT_HDR).getFirst()))
+                .text(requestMap.get(RequestMap.TOTAL_VAT_AMNT_HDR))
                 .font(font)
                 .colorRGB(TEMPLATE_COLOR)
                 .build()
@@ -288,7 +276,7 @@ public abstract class PdfInvoiceDocumentGenerator implements PdfDocumentGenerato
         PdfText.builder()
                 .contentStream(cs)
                 .dimensions(PdfDimensions.ofA4mm(172.0f, posY, 20.0f, 9.0f))
-                .text(String.valueOf(requestMap.get(PdfInvoiceDocumentRequest.TOTAL_GROSS_AMNT_HDR).getFirst()))
+                .text(requestMap.get(RequestMap.TOTAL_GROSS_AMNT_HDR))
                 .font(font)
                 .colorRGB(TEMPLATE_COLOR)
                 .build()
@@ -302,8 +290,9 @@ public abstract class PdfInvoiceDocumentGenerator implements PdfDocumentGenerato
     }
 
     protected void printTotalNetAmount() throws IOException {
-        var totalNetAmount = String.valueOf(requestMap.get(PdfInvoiceDocumentRequest.TOTAL_NET_AMNT).getFirst());
+        var totalNetAmount = requestMap.get(RequestMap.TOTAL_NET_AMNT);
         var posX = 51.5f - (totalNetAmount.length() * 1.8f) + 1;
+
         PdfText.builder()
                 .contentStream(cs)
                 .font(font)
@@ -315,7 +304,7 @@ public abstract class PdfInvoiceDocumentGenerator implements PdfDocumentGenerato
     }
 
     protected void printTotalVatAmount() throws IOException {
-        var totalVatAmount = String.valueOf(requestMap.get(PdfInvoiceDocumentRequest.TOTAL_VAT_AMNT).getFirst());
+        var totalVatAmount = requestMap.get(RequestMap.TOTAL_VAT_AMNT);
         var posX = 108.0f - (totalVatAmount.length() * 1.8f) + 1;
 
         PdfText.builder()
@@ -329,8 +318,9 @@ public abstract class PdfInvoiceDocumentGenerator implements PdfDocumentGenerato
     }
 
     protected void printTotalGrossAmount() throws IOException {
-        var totalGrossAmount = String.valueOf(requestMap.get(PdfInvoiceDocumentRequest.TOTAL_GROSS_AMNT).getFirst());
+        var totalGrossAmount = requestMap.get(RequestMap.TOTAL_GROSS_AMNT);
         var posX = 185.0f - (totalGrossAmount.length() * 1.8f) + 1;
+
         PdfText.builder()
                 .contentStream(cs)
                 .font(font)
@@ -345,7 +335,7 @@ public abstract class PdfInvoiceDocumentGenerator implements PdfDocumentGenerato
         PdfText.builder()
                 .contentStream(cs)
                 .dimensions(PdfDimensions.ofA4mm(26.5f, posY, 50.0f, 9.0f))
-                .text(String.valueOf(requestMap.get(PdfInvoiceDocumentRequest.PAYMENT_TERMS).getFirst()))
+                .text(requestMap.get(RequestMap.PAYMENT_TERMS))
                 .font(font)
                 .colorRGB(TEMPLATE_COLOR)
                 .build()
@@ -353,16 +343,10 @@ public abstract class PdfInvoiceDocumentGenerator implements PdfDocumentGenerato
     }
 
     protected void generateOptionalInvoiceTexts() throws IOException {
-
-        var optionalInvoiceTextObj = requestMap.get(PdfInvoiceDocumentRequest.OPT_INVOICE_TEXTS);
-        List<String> optionalInvoiceTexts = new ArrayList<>();
-        optionalInvoiceTextObj.forEach(obj -> optionalInvoiceTexts.add(String.valueOf(obj)));
-
         posY += 10.0f;
-
         PdfTextBlock.builder()
                 .contentStream(cs)
-                .textLines(optionalInvoiceTexts)
+                .textLines(requestMap.getList(RequestMap.OPT_INVOICE_TEXTS))
                 .font(new PDType1Font(Standard14Fonts.FontName.HELVETICA_OBLIQUE))
                 .colorRGB(TEXT_COLOR)
                 .dimensions(PdfDimensions.ofA4mm(26.0f, posY, 250.0f, 12.0f))
