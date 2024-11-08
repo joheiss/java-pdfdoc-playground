@@ -10,7 +10,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.Calendar;
 
-public class PdfBaseTemplateGenerator implements PdfDocumentGenerator {
+public abstract class PdfBaseTemplateGenerator implements PdfDocumentGenerator {
 
     protected final static String HEADER_FILENAME = "jovisco-letter-head.png";
     protected final static float HEADER_WIDTH = 226.4f;
@@ -47,46 +47,6 @@ public class PdfBaseTemplateGenerator implements PdfDocumentGenerator {
         }
     }
 
-    protected void generateContent() throws IOException, URISyntaxException {
-
-        try (var cs = new PDPageContentStream(template, page)) {
-            this.cs = cs;
-            generateHeaderImage();
-            generateAddressLineImage();
-            generateFooterImage();
-        }
-    }
-
-    protected void generateHeaderImage() throws IOException, URISyntaxException {
-        PdfImage.builder()
-                .document(template)
-                .contentStream(cs)
-                .dimensions(PdfDimensions.ofA4mm(70.0f, 17.0f, HEADER_WIDTH, HEADER_HEIGHT))
-                .imagePath(Paths.get(ClassLoader.getSystemResource(HEADER_FILENAME).toURI()))
-                .build()
-                .draw();
-    }
-
-    protected void generateAddressLineImage() throws IOException, URISyntaxException {
-        PdfImage.builder()
-                .document(template)
-                .contentStream(cs)
-                .dimensions(PdfDimensions.ofA4mm(25.0f, 54.0f,  ADDRESS_LINE_WIDTH, ADDRESS_LINE_HEIGHT))
-                .imagePath(Paths.get(ClassLoader.getSystemResource(ADDRESS_LINE_FILENAME).toURI()))
-                .build()
-                .draw();
-    }
-
-    protected void generateFooterImage() throws IOException, URISyntaxException {
-        PdfImage.builder()
-                .document(template)
-                .contentStream(cs)
-                .dimensions(PdfDimensions.ofA4mm(25.0f, 282.0f, FOOTER_WIDTH, FOOTER_HEIGHT))
-                .imagePath(Paths.get(ClassLoader.getSystemResource(FOOTER_FILENAME).toURI()))
-                .build()
-                .draw();
-    }
-
     protected void fillMetaInformation() {
 
         var now = Calendar.getInstance();
@@ -99,6 +59,46 @@ public class PdfBaseTemplateGenerator implements PdfDocumentGenerator {
         metadata.setModificationDate(now);
         metadata.setKeywords("Jovisco, TemplateJava, PDFBox, Invoicing");
         metadata.setProducer("PDFBox");
+    }
+
+    protected void generateContent() throws IOException, URISyntaxException {
+
+        try (var cs = new PDPageContentStream(template, page)) {
+            this.cs = cs;
+            var block = new PdfBlock(
+                    generateHeaderImage(),
+                    generateAddressLineImage(),
+                    generateFooterImage()
+            );
+            block.print();
+        }
+    }
+
+    protected PdfElement generateHeaderImage() throws IOException, URISyntaxException {
+        return PdfImage.builder()
+                .document(template)
+                .contentStream(cs)
+                .dimensions(PdfDimensions.ofA4mm(70.0f, 17.0f, HEADER_WIDTH, HEADER_HEIGHT))
+                .imagePath(Paths.get(ClassLoader.getSystemResource(HEADER_FILENAME).toURI()))
+                .build();
+    }
+
+    protected PdfElement generateAddressLineImage() throws IOException, URISyntaxException {
+        return PdfImage.builder()
+                .document(template)
+                .contentStream(cs)
+                .dimensions(PdfDimensions.ofA4mm(25.0f, 54.0f,  ADDRESS_LINE_WIDTH, ADDRESS_LINE_HEIGHT))
+                .imagePath(Paths.get(ClassLoader.getSystemResource(ADDRESS_LINE_FILENAME).toURI()))
+                .build();
+    }
+
+    protected PdfElement generateFooterImage() throws IOException, URISyntaxException {
+        return PdfImage.builder()
+                .document(template)
+                .contentStream(cs)
+                .dimensions(PdfDimensions.ofA4mm(25.0f, 282.0f, FOOTER_WIDTH, FOOTER_HEIGHT))
+                .imagePath(Paths.get(ClassLoader.getSystemResource(FOOTER_FILENAME).toURI()))
+                .build();
     }
 
     @Override

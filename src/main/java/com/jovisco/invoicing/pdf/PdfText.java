@@ -5,7 +5,7 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
 import java.io.IOException;
 
-public class PdfText {
+public class PdfText implements PdfElement {
 
     private final PDPageContentStream cs;
     private final String text;
@@ -33,7 +33,8 @@ public class PdfText {
         this.dimensions = dimensions;
     }
 
-    public void printText() throws IOException {
+    @Override
+    public void print() throws IOException {
         cs.beginText();
         if (font != null) cs.setFont(font, dimensions.height());
         if (color != null) cs.setNonStrokingColor(this.color[0], this.color[1], this.color[2]);

@@ -7,7 +7,7 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import java.io.IOException;
 import java.nio.file.Path;
 
-public class PdfImage {
+public class PdfImage implements PdfElement {
 
     private final PDPageContentStream cs;
     private final PDImageXObject image;
@@ -27,7 +27,8 @@ public class PdfImage {
         return PDImageXObject.createFromFile(imagePath.toAbsolutePath().toString(), doc);
     }
 
-    public void draw() throws IOException {
+    @Override
+    public void print() throws IOException {
         cs.drawImage(image, dimensions.x(), dimensions.y(), dimensions.width(), dimensions.height());
     }
 }

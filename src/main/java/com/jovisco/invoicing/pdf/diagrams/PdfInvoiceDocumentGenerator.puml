@@ -21,9 +21,18 @@ class PdfInvoiceDocumentGeneratorDEde extends PdfInvoiceDocumentGenerator {
     # generateContent()
     {method} ...
 }
+class PdfInvoiceItemsBlockGenerator {
+...
+    + generate() : PDDocument
+    # generateItems()
+    {method} ...
+}
 
 PdfInvoiceDocumentGeneratorDEde ...> PdfText : uses
 PdfInvoiceDocumentGeneratorDEde ...> PdfTextBox : uses
 PdfInvoiceDocumentGeneratorDEde ...> PdfLine : uss
 PdfInvoiceDocumentGeneratorDEde ...> PdfDimensions : uses
+PdfInvoiceDocumentGeneratorDEde o-- PdfInvoiceItemsBlockGenerator
+PdfInvoiceItemsBlockGenerator ...> PdfText : uses
+PdfInvoiceItemsBlockGenerator ...> PdfDimensions : uses
 @enduml

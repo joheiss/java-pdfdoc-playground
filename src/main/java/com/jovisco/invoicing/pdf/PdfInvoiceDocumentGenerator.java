@@ -11,7 +11,6 @@ import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.Map;
 
 public abstract class PdfInvoiceDocumentGenerator implements PdfDocumentGenerator {
 
@@ -29,6 +28,7 @@ public abstract class PdfInvoiceDocumentGenerator implements PdfDocumentGenerato
     protected PDPageContentStream cs;
     protected float posY;
     protected String invoiceId;
+    protected PdfInvoiceItemsBlockGenerator itemsBlockGenerator;
 
     public PdfInvoiceDocumentGenerator(
             RequestMap requestMap,
@@ -73,286 +73,217 @@ public abstract class PdfInvoiceDocumentGenerator implements PdfDocumentGenerato
 
         try (var cs = new PDPageContentStream(doc, page, AppendMode.APPEND, false, true)) {
             this.cs = cs;
-            generateAddressLines();
-            generateReferencesBlock();
-            generateBillingPeriod();
-            generateItemsBlock();
-            generateTotalsBlock();
-            generatePaymentTerm();
-            generateOptionalInvoiceTexts();
+            var blocks = new PdfBlock(
+                    generateAddressLines(),
+                    generateReferencesBlock(),
+                    generateBillingPeriod(),
+                    generateItemsBlock(),
+                    generateTotalsBlock(),
+                    generatePaymentTerm(),
+                    generateOptionalInvoiceTexts()
+            );
+            blocks.print();
         }
     }
 
-    protected void generateAddressLines() throws IOException {
-
-        PdfTextBlock.builder()
+    protected PdfElement generateAddressLines() {
+        return PdfTextBlock.builder()
                 .contentStream(cs)
                 .textLines(requestMap.getList(RequestMap.ADDRESS_LINES))
                 .font(font)
                 .colorRGB(TEXT_COLOR)
                 .dimensions(PdfDimensions.ofA4mm(26.0f, 58.0f, 250.0f, 12.0f))
                 .leading(15.0f)
-                .build()
-                .printTextBlock();
+                .build();
     }
 
-    protected void generateReferencesBlock() throws IOException {
-        printInvoiceId();
-        printCustomerId();
-        printInvoiceDate();
+    protected PdfElement generateReferencesBlock() {
+        return new PdfBlock(
+                generateInvoiceId(),
+                generateCustomerId(),
+                generateInvoiceDate()
+        );
     }
 
-    protected void printInvoiceId() throws IOException {
-        PdfText.builder()
+    protected PdfElement generateInvoiceId() {
+        return PdfText.builder()
                 .contentStream(cs)
                 .text(invoiceId)
                 .dimensions(PdfDimensions.ofA4mm(167.0f, 107.0f, 30.0f, 12.0f))
                 .colorRGB(TEXT_COLOR)
-                .build()
-                .printText();
+                .build();
     }
 
-    protected void printCustomerId() throws IOException {
-        PdfText.builder()
+    protected PdfElement generateCustomerId() {
+        return PdfText.builder()
                 .contentStream(cs)
                 .text(requestMap.get(RequestMap.CUSTOMER_ID))
                 .dimensions(PdfDimensions.ofA4mm(167.0f, 101.0f, 30.0f, 12.0f))
                 .colorRGB(TEXT_COLOR)
-                .build()
-                .printText();
+                .build();
     }
 
-    protected void printInvoiceDate() throws IOException {
-        PdfText.builder()
+    protected PdfElement generateInvoiceDate() {
+        return PdfText.builder()
                 .contentStream(cs)
                 .text(requestMap.get(RequestMap.INVOICE_DATE))
                 .dimensions(PdfDimensions.ofA4mm(167.0f, 113.0f, 30.0f, 12.0f))
                 .colorRGB(TEXT_COLOR)
-                .build()
-                .printText();
+                .build();
     }
 
-    protected void generateBillingPeriod() throws IOException {
-        PdfText.builder()
+    protected PdfElement generateBillingPeriod() {
+        return PdfText.builder()
                 .contentStream(cs)
                 .dimensions(PdfDimensions.ofA4mm(26.0f, 111.0f, 250.0f, 12.0f))
                 .text(requestMap.get(RequestMap.BILLING_PERIOD))
                 .colorRGB(TEXT_COLOR)
-                .build()
-                .printText();
+                .build();
     }
 
-    protected void generateItemsBlock() throws IOException {
-
+    protected PdfElement generateItemsBlock() {
         posY = 135.0f;
-        for (var item : requestMap.getItems()) {
-            generateItem(item);
-            posY += 7.0f;
-        }
+        itemsBlockGenerator = new PdfInvoiceItemsBlockGenerator(requestMap, cs, posY);
+        var items = itemsBlockGenerator.generate();
+        posY = itemsBlockGenerator.getPosY();
+        return items;
     }
 
-    protected void generateItem(Map<String, String> itemMap) throws IOException {
-        printItemId(itemMap.get(RequestMap.ITEM_ID));
-        printItemQuantity(itemMap.get(RequestMap.ITEM_QTY));
-        printItemDescription(itemMap.get(RequestMap.ITEM_DESC));
-        printItemUnitNetAmount(itemMap.get(RequestMap.ITEM_UNIT_NET_AMNT));
-        printItemTotalNetAmount(itemMap.get(RequestMap.ITEM_TOTAL_NET_AMNT));
-    }
-
-    protected void printItemId(String itemId) throws IOException {
-        var itemX = 28.0f - (itemId.length() * 1.0f) + 1;
-        PdfText.builder()
-                .contentStream(cs)
-                .font(font)
-                .colorRGB(TEXT_COLOR)
-                .text(itemId)
-                .dimensions(PdfDimensions.ofA4mm(itemX, posY, 5.0f, 12.0f))
-                .build()
-                .printText();
-    }
-
-    protected void printItemQuantity(String quantity) throws IOException {
-        var itemX = 47.0f - (quantity.length() * 2.0f) + 1;
-        PdfText.builder()
-                .contentStream(cs)
-                .font(font)
-                .colorRGB(TEXT_COLOR)
-                .text(quantity)
-                .dimensions(PdfDimensions.ofA4mm(itemX, posY, 10.0f, 12.0f))
-                .build()
-                .printText();
-    }
-
-    protected void printItemDescription(String description) throws IOException {
-        var fontSize = 12.0f - (float) (description.length() / 35);
-        PdfText.builder()
-                .contentStream(cs)
-                .font(font)
-                .colorRGB(TEXT_COLOR)
-                .text(description)
-                .dimensions(PdfDimensions.ofA4mm(58.0f, posY, 80.0f, fontSize))
-                .build()
-                .printText();
-    }
-
-    protected void printItemUnitNetAmount(String amount) throws IOException {
-        var itemX = 155.0f - (amount.length() * 2.1f) + 1;
-        PdfText.builder()
-                .contentStream(cs)
-                .font(font)
-                .colorRGB(TEXT_COLOR)
-                .text(amount)
-                .dimensions(PdfDimensions.ofA4mm(itemX, posY, 20.0f, 12.0f))
-                .build()
-                .printText();
-    }
-
-    protected void printItemTotalNetAmount(String amount) throws IOException {
-        var itemX = 185.0f - (amount.length() * 1.8f) + 1;
-        PdfText.builder()
-                .contentStream(cs)
-                .font(font)
-                .colorRGB(TEXT_COLOR)
-                .text(amount)
-                .dimensions(PdfDimensions.ofA4mm(itemX, posY, 25.0f, 12.0f))
-                .build()
-                .printText();
-    }
-
-    protected void generateTotalsBlock() throws IOException {
-        generateItemsTotalsHeader();
+    protected PdfElement generateTotalsBlock() {
+        var itemsTotalsHeader = generateItemsTotalsHeader();
         posY += 5.0f;
-        generateItemsTotalAmounts();
+        var itemTotalsAmounts = generateItemsTotalAmounts();
         posY += 5.0f;
-        drawLine(PdfDimensions.ofA4mm(26.0f, posY, LINE_WIDTH, 1.0f));
+        var line = drawLine(PdfDimensions.ofA4mm(26.0f, posY, LINE_WIDTH, 1.0f));
+
+        return new PdfBlock(itemsTotalsHeader, itemTotalsAmounts, line);
     }
 
-    protected void generateItemsTotalsHeader() throws IOException {
-        drawLine(PdfDimensions.ofA4mm(26.0f, posY, LINE_WIDTH, 1.0f));
+    protected PdfElement generateItemsTotalsHeader() {
+        var topLine = drawLine(PdfDimensions.ofA4mm(26.0f, posY, LINE_WIDTH, 1.0f));
         posY += 2.5f;
-        generateItemsTotalsHeaderTexts();
+        var itemsTotalsHeaderTexts = generateItemsTotalsHeaderTexts();
         posY += 3.0f;
-        drawLine(PdfDimensions.ofA4mm(26.0f, posY, LINE_WIDTH, 1.0f));
+        var bottomLine = drawLine(PdfDimensions.ofA4mm(26.0f, posY, LINE_WIDTH, 1.0f));
+
+        return new PdfBlock(topLine, itemsTotalsHeaderTexts, bottomLine);
     }
 
-    protected void drawLine(PdfDimensions dimensions) throws IOException {
-        PdfLine.builder()
+    protected PdfElement drawLine(PdfDimensions dimensions) {
+        return PdfLine.builder()
                 .contentStream(cs)
                 .dimensions(dimensions)
                 .colorRGB(TEMPLATE_COLOR)
-                .build()
-                .draw();
+                .build();
     }
 
-    protected void generateItemsTotalsHeaderTexts() throws IOException {
-        printTotalNetAmountHeader();
-        printTotalVatAmountHeader();
-        printTotalGrossAmountHeader();
+    protected PdfElement generateItemsTotalsHeaderTexts() {
+        return new PdfBlock(
+                generateTotalNetAmountHeader(),
+                generateTotalVatAmountHeader(),
+                generateTotalGrossAmountHeader()
+        );
     }
 
-    private void printTotalNetAmountHeader() throws IOException {
-        PdfText.builder()
+    private PdfElement generateTotalNetAmountHeader() {
+        return PdfText.builder()
                 .contentStream(cs)
                 .dimensions(PdfDimensions.ofA4mm(40.0f, posY, 20.0f, 9.0f))
                 .text(requestMap.get(RequestMap.TOTAL_NET_AMNT_HDR))
                 .font(font)
                 .colorRGB(TEMPLATE_COLOR)
-                .build()
-                .printText();
+                .build();
     }
 
-    private void printTotalVatAmountHeader() throws IOException {
-        PdfText.builder()
+    private PdfElement generateTotalVatAmountHeader() {
+        return PdfText.builder()
                 .contentStream(cs)
                 .dimensions(PdfDimensions.ofA4mm(96.5f, posY, 20.0f, 9.0f))
                 .text(requestMap.get(RequestMap.TOTAL_VAT_AMNT_HDR))
                 .font(font)
                 .colorRGB(TEMPLATE_COLOR)
-                .build()
-                .printText();
+                .build();
     }
 
-    private void printTotalGrossAmountHeader() throws IOException {
-        PdfText.builder()
+    private PdfElement generateTotalGrossAmountHeader() {
+        return PdfText.builder()
                 .contentStream(cs)
                 .dimensions(PdfDimensions.ofA4mm(172.0f, posY, 20.0f, 9.0f))
                 .text(requestMap.get(RequestMap.TOTAL_GROSS_AMNT_HDR))
                 .font(font)
                 .colorRGB(TEMPLATE_COLOR)
-                .build()
-                .printText();
+                .build();
     }
 
-    protected void generateItemsTotalAmounts() throws IOException {
-        printTotalNetAmount();
-        printTotalVatAmount();
-        printTotalGrossAmount();
+    protected PdfElement generateItemsTotalAmounts() {
+        return new PdfBlock(
+                generateTotalNetAmount(),
+                generateTotalVatAmount(),
+                generateTotalGrossAmount()
+        );
+
     }
 
-    protected void printTotalNetAmount() throws IOException {
+    protected PdfElement generateTotalNetAmount() {
         var totalNetAmount = requestMap.get(RequestMap.TOTAL_NET_AMNT);
         var posX = 51.5f - (totalNetAmount.length() * 1.8f) + 1;
 
-        PdfText.builder()
+        return PdfText.builder()
                 .contentStream(cs)
                 .font(font)
                 .colorRGB(TEXT_COLOR)
                 .text(totalNetAmount)
                 .dimensions(PdfDimensions.ofA4mm(posX, posY, 25.0f, 12.0f))
-                .build()
-                .printText();
+                .build();
     }
 
-    protected void printTotalVatAmount() throws IOException {
+    protected PdfElement generateTotalVatAmount() {
         var totalVatAmount = requestMap.get(RequestMap.TOTAL_VAT_AMNT);
         var posX = 108.0f - (totalVatAmount.length() * 1.8f) + 1;
 
-        PdfText.builder()
+        return PdfText.builder()
                 .contentStream(cs)
                 .font(font)
                 .colorRGB(TEXT_COLOR)
                 .text(totalVatAmount)
                 .dimensions(PdfDimensions.ofA4mm(posX, posY, 25.0f, 12.0f))
-                .build()
-                .printText();
+                .build();
     }
 
-    protected void printTotalGrossAmount() throws IOException {
+    protected PdfElement generateTotalGrossAmount() {
         var totalGrossAmount = requestMap.get(RequestMap.TOTAL_GROSS_AMNT);
         var posX = 185.0f - (totalGrossAmount.length() * 1.8f) + 1;
 
-        PdfText.builder()
+        return PdfText.builder()
                 .contentStream(cs)
                 .font(font)
                 .colorRGB(TEXT_COLOR)
                 .text(totalGrossAmount)
                 .dimensions(PdfDimensions.ofA4mm(posX, posY, 25.0f, 12.0f))
-                .build()
-                .printText();
+                .build();
     }
-    protected void generatePaymentTerm() throws IOException {
+
+    protected PdfElement generatePaymentTerm() {
         posY += 10.0f;
-        PdfText.builder()
+        return PdfText.builder()
                 .contentStream(cs)
                 .dimensions(PdfDimensions.ofA4mm(26.5f, posY, 50.0f, 9.0f))
                 .text(requestMap.get(RequestMap.PAYMENT_TERMS))
                 .font(font)
                 .colorRGB(TEMPLATE_COLOR)
-                .build()
-                .printText();
+                .build();
     }
 
-    protected void generateOptionalInvoiceTexts() throws IOException {
+    protected PdfElement generateOptionalInvoiceTexts() {
         posY += 10.0f;
-        PdfTextBlock.builder()
+        return PdfTextBlock.builder()
                 .contentStream(cs)
                 .textLines(requestMap.getList(RequestMap.OPT_INVOICE_TEXTS))
                 .font(new PDType1Font(Standard14Fonts.FontName.HELVETICA_OBLIQUE))
                 .colorRGB(TEXT_COLOR)
                 .dimensions(PdfDimensions.ofA4mm(26.0f, posY, 250.0f, 12.0f))
                 .leading(15.0f)
-                .build()
-                .printTextBlock();
+                .build();
     }
 
     protected String generateTargetFilePath() {

@@ -1,8 +1,5 @@
 package com.jovisco.invoicing.pdf;
 
-import java.util.List;
-import java.util.Map;
-
 public class PdfInvoiceDocumentGeneratorDEde extends PdfInvoiceDocumentGenerator {
 
     public PdfInvoiceDocumentGeneratorDEde(
