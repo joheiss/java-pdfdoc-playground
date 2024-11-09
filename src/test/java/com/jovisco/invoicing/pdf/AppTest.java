@@ -5,6 +5,7 @@ import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -17,6 +18,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class AppTest {
 
+    static {
+        System.setProperty("org.apache.commons.logging.Log",
+                "org.apache.commons.logging.impl.NoOpLog");
+    }
+
+    @Order(10)
     @Nested
     @DisplayName("General App Tests")
     class GeneralAppTests {
@@ -26,10 +33,12 @@ class AppTest {
         }
     }
 
+    @Order(20)
     @Nested
     @DisplayName("Test Base Template")
     class BaseTemplateTests {
 
+        @Order(21)
         @Test
         @DisplayName("should create the base template")
         void shouldCreateBaseTemplate() {
@@ -38,6 +47,7 @@ class AppTest {
             assertNotNull(template);
         }
 
+        @Order(22)
         @Test
         @DisplayName("should be accessible")
         void should_be_accessible() {
@@ -54,12 +64,14 @@ class AppTest {
         }
     }
 
+    @Order(30)
     @Nested
     @DisplayName("Test Invoice Template")
     class InvoiceTemplateTests {
 
         RequestMap requestMap = new RequestMap(makeTemplateRequestMap());
 
+        @Order(31)
         @Test
         @DisplayName("should create the invoice template")
         void shouldCreateInvoiceTemplate() {
@@ -71,6 +83,7 @@ class AppTest {
             assertNotNull(template);
         }
 
+        @Order(32)
         @Test
         @DisplayName("should be accessible")
         void should_be_accessible() {
@@ -85,6 +98,7 @@ class AppTest {
             }
         }
 
+        @Order(33)
         @Test
         @DisplayName("should contain predefined text blocks")
         void should_contain_predefined_text_blocks() {
@@ -110,6 +124,7 @@ class AppTest {
         }
     }
 
+    @Order(40)
     @Nested
     @DisplayName("Test Invoice Document")
     class InvoiceDocumentTests {
@@ -117,6 +132,7 @@ class AppTest {
         RequestMap requestMap = new RequestMap(makeDocumentRequestMap());
         String invoiceId = requestMap.get(RequestMap.INVOICE_ID);
 
+        @Order(41)
         @Test
         @DisplayName("should create a invoice document")
         void shouldCreateInvoiceDocument() {
@@ -128,6 +144,7 @@ class AppTest {
             assertNotNull(template);
         }
 
+        @Order(42)
         @Test
         @DisplayName("should be accessible")
         void should_be_accessible() {
@@ -141,6 +158,8 @@ class AppTest {
                 throw new RuntimeException(e);
             }
         }
+
+        @Order(43)
         @Test
         @DisplayName("should contain invoice data")
         void should_contain_invoice_data() {

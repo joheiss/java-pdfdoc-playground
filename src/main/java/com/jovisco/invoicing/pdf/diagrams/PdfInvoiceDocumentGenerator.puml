@@ -21,18 +21,45 @@ class PdfInvoiceDocumentGeneratorDEde extends PdfInvoiceDocumentGenerator {
     # generateContent()
     {method} ...
 }
-class PdfInvoiceItemsBlockGenerator {
-...
-    + generate() : PDDocument
-    # generateItems()
-    {method} ...
-}
+together {
+    abstract class PdfInvoiceBlockGenerator {}
 
-PdfInvoiceDocumentGeneratorDEde ...> PdfText : uses
-PdfInvoiceDocumentGeneratorDEde ...> PdfTextBox : uses
-PdfInvoiceDocumentGeneratorDEde ...> PdfLine : uss
-PdfInvoiceDocumentGeneratorDEde ...> PdfDimensions : uses
+    class PdfInvoiceReferenceBlockGenerator extends PdfInvoiceBlockGenerator {
+        ...
+            + generate() : PDDocument
+            # generateItems()
+            {method} ...
+    }
+    class PdfInvoiceItemsBlockGenerator extends PdfInvoiceBlockGenerator {
+    ...
+        + generate() : PDDocument
+        # generateItems()
+        {method} ...
+    }
+
+    class PdfInvoiceItemsTotalsBlockGenerator extends PdfInvoiceBlockGenerator{
+    ...
+        + generate() : PDDocument
+        # generateItems()
+        {method} ...
+    }
+}
+PdfInvoiceDocumentGeneratorDEde .d.> PdfBlock : uses
+PdfInvoiceDocumentGeneratorDEde .d.> PdfText : uses
+PdfInvoiceDocumentGeneratorDEde .d.> PdfTextBox : uses
+PdfInvoiceDocumentGeneratorDEde .d.> PdfLine : uss
+PdfInvoiceDocumentGeneratorDEde .d.> PdfDimensions : uses
+PdfInvoiceDocumentGeneratorDEde o-- PdfInvoiceReferenceBlockGenerator
 PdfInvoiceDocumentGeneratorDEde o-- PdfInvoiceItemsBlockGenerator
-PdfInvoiceItemsBlockGenerator ...> PdfText : uses
-PdfInvoiceItemsBlockGenerator ...> PdfDimensions : uses
+PdfInvoiceDocumentGeneratorDEde o-- PdfInvoiceItemsTotalsBlockGenerator
+PdfInvoiceReferencelockGenerator .d.> PdfBlock : uses
+PdfInvoiceReferencelockGenerator .d.> PdfText : uses
+PdfInvoiceReferenceBlockGenerator .d.> PdfDimensions : uses
+PdfInvoiceItemsBlockGenerator .d.> PdfBlock : uses
+PdfInvoiceItemsBlockGenerator .d.> PdfText : uses
+PdfInvoiceItemsBlockGenerator .d.> PdfDimensions : uses
+PdfInvoiceItemsTotalsBlockGenerator .d.> PdfBlock : uses
+PdfInvoiceItemsTotalsBlockGenerator .d.> PdfText : uses
+PdfInvoiceItemsTotalsBlockGenerator .d.> PdfLine : uses
+PdfInvoiceItemsTotalsBlockGenerator .d.> PdfDimensions : uses
 @enduml

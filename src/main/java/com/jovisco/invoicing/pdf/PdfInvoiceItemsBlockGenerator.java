@@ -1,28 +1,16 @@
 package com.jovisco.invoicing.pdf;
 
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 
 import java.util.Map;
 
-public class PdfInvoiceItemsBlockGenerator {
-
-    protected static final int[] TEXT_COLOR = {0, 0, 0};
-    protected final PDType1Font font = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
-
-    protected final RequestMap requestMap;
-    protected final PDPageContentStream cs;
-    protected final float startY;
-
-    private float posY;
+public class PdfInvoiceItemsBlockGenerator extends PdfInvoiceBlockGenerator{
 
     public PdfInvoiceItemsBlockGenerator(RequestMap requestMap, PDPageContentStream cs, float startY) {
-        this.requestMap = requestMap;
-        this.cs = cs;
-        this.startY = startY;
+        super(requestMap, cs, startY);
     }
 
+    @Override
     public PdfElement generate() {
         posY = startY;
         PdfElement[] items = new PdfElement[requestMap.getItems().size()];
@@ -96,9 +84,5 @@ public class PdfInvoiceItemsBlockGenerator {
                 .text(amount)
                 .dimensions(PdfDimensions.ofA4mm(itemX, posY, 25.0f, 12.0f))
                 .build();
-    }
-
-    protected float getPosY() {
-        return posY;
     }
 }

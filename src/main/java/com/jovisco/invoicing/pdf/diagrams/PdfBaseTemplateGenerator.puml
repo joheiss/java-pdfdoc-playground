@@ -22,6 +22,7 @@ class PdfBaseTemplateGeneratorDEde extends PdfBaseTemplateGenerator {
     {method} ...
 }
 
+PdfBaseTemplateGeneratorDEde ...> PdfBlock : uses
 PdfBaseTemplateGeneratorDEde ...> PdfImage : uses
 PdfBaseTemplateGeneratorDEde ...> PdfText : uses
 PdfBaseTemplateGeneratorDEde ...> PdfLine : uses

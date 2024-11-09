@@ -16,7 +16,6 @@ public abstract class PdfInvoiceDocumentGenerator implements PdfDocumentGenerato
 
     protected static final int[] TEXT_COLOR = {0, 0, 0};
     protected static final int[] TEMPLATE_COLOR = {1, 94, 104};
-    private final static float LINE_WIDTH = 163.0f * PdfDimensions.PAGE_WIDTH_FACTOR;
 
     protected final RequestMap requestMap;
     protected final String invoiceTemplateFilePath;
@@ -28,7 +27,11 @@ public abstract class PdfInvoiceDocumentGenerator implements PdfDocumentGenerato
     protected PDPageContentStream cs;
     protected float posY;
     protected String invoiceId;
+
+    protected PdfInvoiceReferenceBlockGenerator referenceBlockGenerator;
     protected PdfInvoiceItemsBlockGenerator itemsBlockGenerator;
+    protected PdfInvoiceItemsTotalsBlockGenerator itemsTotalsBlockGenerator;
+
 
     public PdfInvoiceDocumentGenerator(
             RequestMap requestMap,
@@ -98,38 +101,11 @@ public abstract class PdfInvoiceDocumentGenerator implements PdfDocumentGenerato
     }
 
     protected PdfElement generateReferencesBlock() {
-        return new PdfBlock(
-                generateInvoiceId(),
-                generateCustomerId(),
-                generateInvoiceDate()
-        );
-    }
-
-    protected PdfElement generateInvoiceId() {
-        return PdfText.builder()
-                .contentStream(cs)
-                .text(invoiceId)
-                .dimensions(PdfDimensions.ofA4mm(167.0f, 107.0f, 30.0f, 12.0f))
-                .colorRGB(TEXT_COLOR)
-                .build();
-    }
-
-    protected PdfElement generateCustomerId() {
-        return PdfText.builder()
-                .contentStream(cs)
-                .text(requestMap.get(RequestMap.CUSTOMER_ID))
-                .dimensions(PdfDimensions.ofA4mm(167.0f, 101.0f, 30.0f, 12.0f))
-                .colorRGB(TEXT_COLOR)
-                .build();
-    }
-
-    protected PdfElement generateInvoiceDate() {
-        return PdfText.builder()
-                .contentStream(cs)
-                .text(requestMap.get(RequestMap.INVOICE_DATE))
-                .dimensions(PdfDimensions.ofA4mm(167.0f, 113.0f, 30.0f, 12.0f))
-                .colorRGB(TEXT_COLOR)
-                .build();
+        posY = 101.0f;
+        referenceBlockGenerator = new PdfInvoiceReferenceBlockGenerator(requestMap, cs, posY);
+        var references = referenceBlockGenerator.generate();
+        posY = referenceBlockGenerator.getPosY();
+        return references;
     }
 
     protected PdfElement generateBillingPeriod() {
@@ -150,117 +126,10 @@ public abstract class PdfInvoiceDocumentGenerator implements PdfDocumentGenerato
     }
 
     protected PdfElement generateTotalsBlock() {
-        var itemsTotalsHeader = generateItemsTotalsHeader();
-        posY += 5.0f;
-        var itemTotalsAmounts = generateItemsTotalAmounts();
-        posY += 5.0f;
-        var line = drawLine(PdfDimensions.ofA4mm(26.0f, posY, LINE_WIDTH, 1.0f));
-
-        return new PdfBlock(itemsTotalsHeader, itemTotalsAmounts, line);
-    }
-
-    protected PdfElement generateItemsTotalsHeader() {
-        var topLine = drawLine(PdfDimensions.ofA4mm(26.0f, posY, LINE_WIDTH, 1.0f));
-        posY += 2.5f;
-        var itemsTotalsHeaderTexts = generateItemsTotalsHeaderTexts();
-        posY += 3.0f;
-        var bottomLine = drawLine(PdfDimensions.ofA4mm(26.0f, posY, LINE_WIDTH, 1.0f));
-
-        return new PdfBlock(topLine, itemsTotalsHeaderTexts, bottomLine);
-    }
-
-    protected PdfElement drawLine(PdfDimensions dimensions) {
-        return PdfLine.builder()
-                .contentStream(cs)
-                .dimensions(dimensions)
-                .colorRGB(TEMPLATE_COLOR)
-                .build();
-    }
-
-    protected PdfElement generateItemsTotalsHeaderTexts() {
-        return new PdfBlock(
-                generateTotalNetAmountHeader(),
-                generateTotalVatAmountHeader(),
-                generateTotalGrossAmountHeader()
-        );
-    }
-
-    private PdfElement generateTotalNetAmountHeader() {
-        return PdfText.builder()
-                .contentStream(cs)
-                .dimensions(PdfDimensions.ofA4mm(40.0f, posY, 20.0f, 9.0f))
-                .text(requestMap.get(RequestMap.TOTAL_NET_AMNT_HDR))
-                .font(font)
-                .colorRGB(TEMPLATE_COLOR)
-                .build();
-    }
-
-    private PdfElement generateTotalVatAmountHeader() {
-        return PdfText.builder()
-                .contentStream(cs)
-                .dimensions(PdfDimensions.ofA4mm(96.5f, posY, 20.0f, 9.0f))
-                .text(requestMap.get(RequestMap.TOTAL_VAT_AMNT_HDR))
-                .font(font)
-                .colorRGB(TEMPLATE_COLOR)
-                .build();
-    }
-
-    private PdfElement generateTotalGrossAmountHeader() {
-        return PdfText.builder()
-                .contentStream(cs)
-                .dimensions(PdfDimensions.ofA4mm(172.0f, posY, 20.0f, 9.0f))
-                .text(requestMap.get(RequestMap.TOTAL_GROSS_AMNT_HDR))
-                .font(font)
-                .colorRGB(TEMPLATE_COLOR)
-                .build();
-    }
-
-    protected PdfElement generateItemsTotalAmounts() {
-        return new PdfBlock(
-                generateTotalNetAmount(),
-                generateTotalVatAmount(),
-                generateTotalGrossAmount()
-        );
-
-    }
-
-    protected PdfElement generateTotalNetAmount() {
-        var totalNetAmount = requestMap.get(RequestMap.TOTAL_NET_AMNT);
-        var posX = 51.5f - (totalNetAmount.length() * 1.8f) + 1;
-
-        return PdfText.builder()
-                .contentStream(cs)
-                .font(font)
-                .colorRGB(TEXT_COLOR)
-                .text(totalNetAmount)
-                .dimensions(PdfDimensions.ofA4mm(posX, posY, 25.0f, 12.0f))
-                .build();
-    }
-
-    protected PdfElement generateTotalVatAmount() {
-        var totalVatAmount = requestMap.get(RequestMap.TOTAL_VAT_AMNT);
-        var posX = 108.0f - (totalVatAmount.length() * 1.8f) + 1;
-
-        return PdfText.builder()
-                .contentStream(cs)
-                .font(font)
-                .colorRGB(TEXT_COLOR)
-                .text(totalVatAmount)
-                .dimensions(PdfDimensions.ofA4mm(posX, posY, 25.0f, 12.0f))
-                .build();
-    }
-
-    protected PdfElement generateTotalGrossAmount() {
-        var totalGrossAmount = requestMap.get(RequestMap.TOTAL_GROSS_AMNT);
-        var posX = 185.0f - (totalGrossAmount.length() * 1.8f) + 1;
-
-        return PdfText.builder()
-                .contentStream(cs)
-                .font(font)
-                .colorRGB(TEXT_COLOR)
-                .text(totalGrossAmount)
-                .dimensions(PdfDimensions.ofA4mm(posX, posY, 25.0f, 12.0f))
-                .build();
+        itemsTotalsBlockGenerator = new PdfInvoiceItemsTotalsBlockGenerator(requestMap, cs, posY);
+        var totals = itemsTotalsBlockGenerator.generate();
+        posY = itemsTotalsBlockGenerator.getPosY();
+        return totals;
     }
 
     protected PdfElement generatePaymentTerm() {
@@ -288,10 +157,5 @@ public abstract class PdfInvoiceDocumentGenerator implements PdfDocumentGenerato
 
     protected String generateTargetFilePath() {
         return "target/test-R" + invoiceId + ".pdf";
-    }
-
-    @Override
-    public boolean documentExists(String filePath) {
-        return false;
     }
 }

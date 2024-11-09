@@ -22,8 +22,31 @@ class PdfInvoiceTemplateGeneratorDEde extends PdfInvoiceTemplateGenerator {
     {method} ...
 }
 
+class PdfInvoiceItemsHeaderBlockGenerator extends PdfInvoiceBlockGenerator {
+...
+    + generate() : PDDocument
+    # generateItems()
+    {method} ...
+}
+
+class PdfInvoiceReferenceHeaderBlockGenerator extends PdfInvoiceBlockGenerator {
+...
+    + generate() : PDDocument
+    {method} ...
+}
+PdfInvoiceTemplateGeneratorDEde ...> PdfBlock : uses
 PdfInvoiceTemplateGeneratorDEde ...> PdfTextBox : uses
 PdfInvoiceTemplateGeneratorDEde ...> PdfText : uses
 PdfInvoiceTemplateGeneratorDEde ...> PdfLine : uses
 PdfInvoiceTemplateGeneratorDEde ...> PdfDimensions : uses
+PdfInvoiceTemplateGeneratorDEde o-- PdfInvoiceItemsHeaderBlockGenerator
+PdfInvoiceTemplateGeneratorDEde o-- PdfInvoiceReferenceHeaderBlockGenerator
+PdfInvoiceItemsHeaderBlockGenerator ...> PdfBlock : uses
+PdfInvoiceItemsHeaderBlockGenerator ...> PdfText : uses
+PdfInvoiceItemsHeaderBlockGenerator ...> PdfLine : uses
+PdfInvoiceItemsHeaderBlockGenerator ...> PdfDimensions : uses
+PdfInvoiceReferenceHeaderBlockGenerator ...> PdfBlock : uses
+PdfInvoiceReferenceHeaderBlockGenerator ...> PdfText : uses
+PdfInvoiceReferenceHeaderBlockGenerator ...> PdfLine : uses
+PdfInvoiceReferenceHeaderBlockGenerator ...> PdfDimensions : uses
 @enduml

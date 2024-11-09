@@ -6,36 +6,45 @@ skinparam class {
   BackgroundColor<<abstract>> #ccccff
 }
 
-class PdfLine {
+interface PdfElement {
+    + print()
+}
+
+class PdfBlock implements PdfElement {
+    {field} - elements: List<PdfElement>
+    + print()
+}
+
+class PdfLine implements PdfElement {
     {field} - dimensions : PdfDimensions
     {field} - color : float[]
     {field} ...
-    + draw()
+    + print()
 }
 
-class PdfImage {
+class PdfImage implements PdfElement {
     {field} - dimensions : PdfDimensions
     {field} - image : PDXImageXObject
     {field} ...
-    + draw()
+    + print()
 }
 
-class PdfText {
+class PdfText implements PdfElement {
     {field} - dimensions : PdfDimensions
     {field} - text : String
     {field} - font : PDType1Font
     {field} - color : float[]
     {field} ...
-    + printText()
+    + print()
 }
 
-class PdfTextBlock {
+class PdfTextBlock implements PdfElement {
     {field} - dimensions : PdfDimensions
     {field} - textLines : String[]
     {field} - font : PDType1Font
     {field} - color : float[]
     {field} ...
-    + printTextLines()
+    + print()
 }
 
 class PdfDimensions {
