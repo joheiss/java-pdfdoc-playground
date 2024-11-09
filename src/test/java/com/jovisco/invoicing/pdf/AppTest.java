@@ -62,6 +62,16 @@ class AppTest {
                 throw new RuntimeException(e);
             }
         }
+
+        @Order(24)
+        @Test
+        @DisplayName("should throw an exception if target file cannot be saved")
+        void should_throw_if_file_not_saved() {
+            assertThrows(RuntimeException.class, () -> {
+                var generator = new PdfBaseTemplateGeneratorDEde("XXXtarget/test-basetemplate.pdf");
+                var template = generator.generate();
+            });
+        }
     }
 
     @Order(30)
@@ -122,6 +132,20 @@ class AppTest {
                 throw new RuntimeException(e);
             }
         }
+
+        @Order(34)
+        @Test
+        @DisplayName("should throw an exception if base template is not found")
+        void should_throw_if_base_template_not_found() {
+            assertThrows(RuntimeException.class, () -> {
+                var generator = new PdfInvoiceTemplateGeneratorDEde(
+                        requestMap,
+                        "XXXtarget/test-basetemplate.pdf",
+                        "target/test-invoicetemplate.pdf");
+                var template = generator.generate();
+            });
+        }
+
     }
 
     @Order(40)

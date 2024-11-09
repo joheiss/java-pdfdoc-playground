@@ -6,7 +6,9 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Calendar;
 
@@ -79,7 +81,7 @@ public abstract class PdfBaseTemplateGenerator implements PdfDocumentGenerator {
                 .document(template)
                 .contentStream(cs)
                 .dimensions(PdfDimensions.ofA4mm(70.0f, 17.0f, HEADER_WIDTH, HEADER_HEIGHT))
-                .imagePath(Paths.get(ClassLoader.getSystemResource(HEADER_FILENAME).toURI()))
+                .imagePath(getImagePath(HEADER_FILENAME))
                 .build();
     }
 
@@ -88,7 +90,7 @@ public abstract class PdfBaseTemplateGenerator implements PdfDocumentGenerator {
                 .document(template)
                 .contentStream(cs)
                 .dimensions(PdfDimensions.ofA4mm(25.0f, 54.0f,  ADDRESS_LINE_WIDTH, ADDRESS_LINE_HEIGHT))
-                .imagePath(Paths.get(ClassLoader.getSystemResource(ADDRESS_LINE_FILENAME).toURI()))
+                .imagePath(getImagePath(ADDRESS_LINE_FILENAME))
                 .build();
     }
 
@@ -97,8 +99,14 @@ public abstract class PdfBaseTemplateGenerator implements PdfDocumentGenerator {
                 .document(template)
                 .contentStream(cs)
                 .dimensions(PdfDimensions.ofA4mm(25.0f, 282.0f, FOOTER_WIDTH, FOOTER_HEIGHT))
-                .imagePath(Paths.get(ClassLoader.getSystemResource(FOOTER_FILENAME).toURI()))
+                .imagePath(getImagePath(FOOTER_FILENAME))
                 .build();
+    }
+
+    private Path getImagePath(String imageFilename) throws IOException, URISyntaxException {
+        var imageUrl = ClassLoader.getSystemResource(imageFilename);
+        if (imageUrl == null) throw new IOException("Image file " + imageFilename + " not found");
+        return Paths.get(imageUrl.toURI());
     }
 
     @Override
