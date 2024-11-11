@@ -2,13 +2,20 @@ package com.jovisco.pdf.invoice;
 
 import com.jovisco.pdf.base.PdfBaseTemplateGeneratorDEde;
 import com.jovisco.pdf.core.RequestMap;
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class PdfInvoiceDocumentTest {
 
@@ -18,6 +25,8 @@ class PdfInvoiceDocumentTest {
     void setup() {
         requestMap = new RequestMap(makeDocumentRequestMap());
     }
+
+    @Order(30)
     @Test
     @DisplayName("should create a invoice document pdf and save it at the given path")
     void test_create() {
@@ -30,6 +39,51 @@ class PdfInvoiceDocumentTest {
                 baseTemplateGenerator, invoiceTemplateGenerator, invoiceDocumentGenerator, documentFilePath);
 
         document.create();
+    }
+    @Order(31)
+    @Test
+    @DisplayName("should be accessible and contain predefined text blocks")
+    void should_contain_predefined_text_blocks() {
+        var invoiceId = requestMap.get(RequestMap.INVOICE_ID);
+        var documentFilePath = "target/test-invoicedocument-" + invoiceId +".pdf";
+        try (var doc = Loader.loadPDF(new File(documentFilePath))) {
+            var pdfStripper = new PDFTextStripper();
+            //Retrieving text from PDF document
+            var text = pdfStripper.getText(doc);
+            // contains address lines, billing period,reference ids, item lines, totals, and payment terms
+            var firstAddressLine = requestMap.getList(RequestMap.ADDRESS_LINES).getFirst();
+            assertTrue(text.contains(firstAddressLine));
+            assertTrue(text.contains(requestMap.get(RequestMap.BILLING_PERIOD)));
+            assertTrue(text.contains(invoiceId));
+            assertTrue(text.contains(requestMap.get(RequestMap.CUSTOMER_ID)));
+            assertTrue(text.contains(requestMap.get(RequestMap.INVOICE_DATE)));
+            var firstItem = requestMap.getItems().getFirst();
+            assertTrue(text.contains(firstItem.get(RequestMap.ITEM_ID)));
+            assertTrue(text.contains(firstItem.get(RequestMap.ITEM_QTY)));
+            assertTrue(text.contains(firstItem.get(RequestMap.ITEM_DESC)));
+            assertTrue(text.contains(requestMap.get(RequestMap.TOTAL_GROSS_AMNT)));
+            assertTrue(text.contains(requestMap.get(RequestMap.PAYMENT_TERMS)));
+            var firstOptionalInvoiceText = requestMap.getList(RequestMap.OPT_INVOICE_TEXTS).getFirst();
+            assertTrue(firstOptionalInvoiceText != null && text.contains(firstOptionalInvoiceText));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Order(32)
+    @Test
+    @DisplayName("should throw an exception if target file cannot be saved")
+    void should_throw_if_file_not_saved() {
+        assertThrows(RuntimeException.class, () -> {
+            var invoiceId = requestMap.get(RequestMap.INVOICE_ID);
+            var documentFilePath = "NOACCESS/test-invoicedocument-" + invoiceId +".pdf";
+            var baseTemplateGenerator = new PdfBaseTemplateGeneratorDEde(requestMap);
+            var invoiceTemplateGenerator = new PdfInvoiceTemplateGeneratorDEde(requestMap);
+            var invoiceDocumentGenerator = new PdfInvoiceDocumentGeneratorDEde(requestMap);
+            var document = new PdfInvoiceDocument(
+                    baseTemplateGenerator, invoiceTemplateGenerator, invoiceDocumentGenerator, documentFilePath);
+            document.create();
+        });
     }
 
     private Map<String, List<Object>> makeDocumentRequestMap() {
