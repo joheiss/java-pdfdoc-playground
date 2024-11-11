@@ -1,9 +1,12 @@
 package com.jovisco.pdf.base;
 
+import com.jovisco.pdf.core.RequestMap;
+
 public class PdfBaseTemplateGeneratorDEde extends PdfBaseTemplateGenerator {
 
-    public PdfBaseTemplateGeneratorDEde(String filePath) {
-        super(filePath);
+
+    public PdfBaseTemplateGeneratorDEde(RequestMap requestMap) {
+        super(requestMap);
     }
 
     protected void fillMetaInformation() {

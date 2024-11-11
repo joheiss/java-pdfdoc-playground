@@ -1,7 +1,6 @@
 package com.jovisco.pdf.invoice;
 
 import com.jovisco.pdf.core.*;
-import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -9,64 +8,36 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream.AppendMode;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Calendar;
 
 public abstract class PdfInvoiceTemplateGenerator implements PdfDocumentGenerator {
 
     protected static final int[] TEMPLATE_COLOR = {1, 94, 104};
+    protected static final PDType1Font font = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
 
     protected final RequestMap requestMap;
-    protected final String baseTemplateFilePath;
-    protected final String targetFilePath;
-    protected final PDType1Font font = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
 
     protected PDDocument template;
     protected PDPage page;
     protected PDPageContentStream cs;
     protected PdfPosY posY;
-    protected PdfInvoiceReferenceHeaderBlockGenerator referenceHeaderBlockGenerator;
-    protected PdfInvoiceItemsHeaderBlockGenerator itemsHeaderBlockGenerator;
+    protected PdfBlockGenerator referenceHeaderBlockGenerator;
+    protected PdfBlockGenerator itemsHeaderBlockGenerator;
 
-    public PdfInvoiceTemplateGenerator(
-            RequestMap requestMap,
-            String baseTemplateFilePath,
-            String targetFilePath)
-    {
+    public PdfInvoiceTemplateGenerator(RequestMap requestMap) {
         this.requestMap = requestMap;
-        this.baseTemplateFilePath = baseTemplateFilePath;
-        this.targetFilePath = targetFilePath;
         this.posY = new PdfPosY();
     }
 
-    @Override
-    public PDDocument generate() {
-
-        try (var template = Loader.loadPDF(new File(baseTemplateFilePath))) {
+    public PDDocument generate(PDDocument template) {
+        try {
             this.template = template;
-            fillMetaInformation();
             this.page = template.getPage(0);
             generateContent();
-            template.save(targetFilePath);
             return template;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    protected void fillMetaInformation() {
-
-        var now = Calendar.getInstance();
-
-        var metadata = template.getDocumentInformation();
-        metadata.setTitle("Jovisco GmbH - Invoice Template (DE_de)");
-        metadata.setAuthor("Jo Heiss");
-        metadata.setSubject("Invoice Template");
-        metadata.setCreationDate(now);
-        metadata.setModificationDate(now);
-        metadata.setKeywords("Jovisco, Template, Invoice, Invoicing, DE_de");
-        metadata.setProducer("PDFBox");
     }
 
     protected void generateContent() throws IOException {

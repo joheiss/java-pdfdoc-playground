@@ -4,7 +4,6 @@ import com.jovisco.pdf.core.*;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.common.PDRectangle;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -24,29 +23,32 @@ public abstract class PdfBaseTemplateGenerator implements PdfDocumentGenerator {
     protected final static float FOOTER_HEIGHT = 70.0f;
     protected final static String FOOTER_FILENAME = "jovisco-letter-foot.png";
 
-    protected final String filePath;
+    protected final RequestMap requestMap;
+
     protected PDDocument template;
     protected PDPage page;
     protected PDPageContentStream cs;
 
-    public PdfBaseTemplateGenerator(String filePath) {
-        this.filePath = filePath;
+    public PdfBaseTemplateGenerator(RequestMap requestMap) {
+        this.requestMap = requestMap;
     }
 
     @Override
-    public PDDocument generate() {
+    public PDDocument generate(PDDocument template) {
 
-        try (var template = new PDDocument()) {
+        try {
             this.template = template;
-            fillMetaInformation();
-            this.page = new PDPage(PDRectangle.A4);
-            template.addPage(page);
+            this.page = this.template.getPage(0);
             generateContent();
-            template.save(filePath);
             return template;
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public RequestMap getRequestMap() {
+        return this.requestMap;
     }
 
     protected void fillMetaInformation() {

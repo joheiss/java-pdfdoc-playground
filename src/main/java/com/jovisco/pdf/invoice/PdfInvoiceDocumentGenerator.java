@@ -1,7 +1,6 @@
 package com.jovisco.pdf.invoice;
 
 import com.jovisco.pdf.core.*;
-import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -9,19 +8,15 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream.AppendMode;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Calendar;
 
 public abstract class PdfInvoiceDocumentGenerator implements PdfDocumentGenerator {
 
     protected static final int[] TEXT_COLOR = {0, 0, 0};
     protected static final int[] TEMPLATE_COLOR = {1, 94, 104};
+    protected static final PDType1Font font = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
 
     protected final RequestMap requestMap;
-    protected final String invoiceTemplateFilePath;
-    protected final String targetFilePath;
-    protected final PDType1Font font = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
 
     protected PDDocument doc;
     protected PDPage page;
@@ -29,49 +24,30 @@ public abstract class PdfInvoiceDocumentGenerator implements PdfDocumentGenerato
     protected String invoiceId;
 
     protected PdfPosY posY;
-    protected PdfInvoiceReferenceBlockGenerator referenceBlockGenerator;
-    protected PdfInvoiceItemsBlockGenerator itemsBlockGenerator;
-    protected PdfInvoiceItemsTotalsBlockGenerator itemsTotalsBlockGenerator;
+    protected PdfBlockGenerator referenceBlockGenerator;
+    protected PdfBlockGenerator itemsBlockGenerator;
+    protected PdfBlockGenerator itemsTotalsBlockGenerator;
 
-
-    public PdfInvoiceDocumentGenerator(
-            RequestMap requestMap,
-            String invoiceTemplateFilePath,
-            String targetFilePath)
-    {
+    public PdfInvoiceDocumentGenerator(RequestMap requestMap) {
         this.requestMap = requestMap;
-        this.invoiceTemplateFilePath = invoiceTemplateFilePath;
-        this.targetFilePath = targetFilePath;
         this.invoiceId = this.requestMap.get(RequestMap.INVOICE_ID);
         this.posY = new PdfPosY();
     }
 
-    @Override
-    public PDDocument generate() {
-        try (var doc = Loader.loadPDF(new File(invoiceTemplateFilePath))) {
-            this.doc = doc;
-            fillMetaInformation();
-            this.page = doc.getPage(0);
+    public PDDocument generate(PDDocument document) {
+        try {
+            this.doc = document;
+            this.page = document.getPage(0);
             generateContent();
-            doc.save(generateTargetFilePath());
-            return doc;
+            return document;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    protected void fillMetaInformation() {
-
-        var now = Calendar.getInstance();
-
-        var metadata = doc.getDocumentInformation();
-        metadata.setTitle("Jovisco GmbH - Invoice " + invoiceId);
-        metadata.setAuthor("Jo Heiss");
-        metadata.setSubject("Invoice " + invoiceId);
-        metadata.setCreationDate(now);
-        metadata.setModificationDate(now);
-        metadata.setKeywords("Jovisco, Invoice, " + invoiceId);
-        metadata.setProducer("PDFBox");
+    @Override
+    public RequestMap getRequestMap() {
+        return this.requestMap;
     }
 
     protected void generateContent() throws IOException {
@@ -151,9 +127,5 @@ public abstract class PdfInvoiceDocumentGenerator implements PdfDocumentGenerato
                 .dimensions(PdfDimensions.ofA4mm(26.0f, posY.getY(), 250.0f, 12.0f))
                 .leading(15.0f)
                 .build();
-    }
-
-    protected String generateTargetFilePath() {
-        return "target/test-R" + invoiceId + ".pdf";
     }
 }
