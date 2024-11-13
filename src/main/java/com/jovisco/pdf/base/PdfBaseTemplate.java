@@ -1,5 +1,6 @@
 package com.jovisco.pdf.base;
 
+import com.jovisco.pdf.core.PdfDocumentCreator;
 import com.jovisco.pdf.core.PdfDocumentGenerator;
 import lombok.RequiredArgsConstructor;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -10,7 +11,7 @@ import java.io.IOException;
 import java.util.Calendar;
 
 @RequiredArgsConstructor
-public class PdfBaseTemplate {
+public class PdfBaseTemplate implements PdfDocumentCreator {
 
     private final PdfDocumentGenerator generator;
     private final String filePath;

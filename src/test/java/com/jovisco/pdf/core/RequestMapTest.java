@@ -16,8 +16,8 @@ class RequestMapTest {
 
     @BeforeEach
     void setUp() {
-        Map<String, List<Object>> requests = new HashMap<>();
-        requests.put("toBeFoundSingle", List.of("found"));
+        Map<String, Object> requests = new HashMap<>();
+        requests.put("toBeFoundSingle","found");
         requests.put("toBeFoundList", List.of("first item", "second item"));
         requests.put("emptyList", List.of());
 
@@ -57,7 +57,7 @@ class RequestMapTest {
     @Test
     @DisplayName("should return a list of items if found")
     void getItems_found() {
-        Map<String, List<Object>> itemRequest = new HashMap<>();
+        Map<String, Object> itemRequest = new HashMap<>();
         itemRequest.put(RequestMap.ITEMS, List.of(
                 Map.of(
                         RequestMap.ITEM_ID, "1",

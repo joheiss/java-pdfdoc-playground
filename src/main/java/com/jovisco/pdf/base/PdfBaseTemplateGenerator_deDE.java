@@ -2,10 +2,10 @@ package com.jovisco.pdf.base;
 
 import com.jovisco.pdf.core.RequestMap;
 
-public class PdfBaseTemplateGeneratorDEde extends PdfBaseTemplateGenerator {
+public class PdfBaseTemplateGenerator_deDE extends PdfBaseTemplateGenerator {
 
 
-    public PdfBaseTemplateGeneratorDEde(RequestMap requestMap) {
+    public PdfBaseTemplateGenerator_deDE(RequestMap requestMap) {
         super(requestMap);
     }
 

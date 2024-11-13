@@ -2,9 +2,9 @@ package com.jovisco.pdf.invoice;
 
 import com.jovisco.pdf.core.RequestMap;
 
-public class PdfInvoiceTemplateGeneratorDEde extends PdfInvoiceTemplateGenerator {
+public class PdfInvoiceTemplateGenerator_deDE extends PdfInvoiceTemplateGenerator {
 
-    public PdfInvoiceTemplateGeneratorDEde(RequestMap requestMap) {
+    public PdfInvoiceTemplateGenerator_deDE(RequestMap requestMap) {
         super(requestMap);
     }
 

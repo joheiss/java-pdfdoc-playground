@@ -30,7 +30,7 @@ class PdfBaseTemplateTest {
     @DisplayName("should create a base template pdf and save it at the given path")
     void test_create() {
 
-        var templateGenerator = new PdfBaseTemplateGeneratorDEde(requestMap);
+        var templateGenerator = new PdfBaseTemplateGenerator_deDE(requestMap);
         var template = new PdfBaseTemplate(templateGenerator, templateFilePath);
 
         template.create();
@@ -56,7 +56,7 @@ class PdfBaseTemplateTest {
     @DisplayName("should throw an exception if target file cannot be saved")
     void should_throw_if_file_not_saved() {
         assertThrows(RuntimeException.class, () -> {
-            var templateGenerator = new PdfBaseTemplateGeneratorDEde(requestMap);
+            var templateGenerator = new PdfBaseTemplateGenerator_deDE(requestMap);
             var template = new PdfBaseTemplate(templateGenerator, "NOACCESS/test-basetemplate.pdf");
             template.create();
         });

@@ -41,31 +41,37 @@ public class RequestMap {
     public static final String ITEM_UNIT_NET_AMNT = "unitNetAmount";
     public static final String ITEM_TOTAL_NET_AMNT = "totalNetAmount";
 
-    private final Map<String, List<Object>> requestMap;
+    private final Map<String, Object> requestMap;
 
-    public RequestMap(Map<String, List<Object>> requestMap) {
+    public RequestMap(Map<String, Object> requestMap) {
         this.requestMap = requestMap;
     }
 
     public String get(String key) {
-        return String.valueOf(requestMap.get(key) != null ? requestMap.get(key).getFirst() : "");
+        return String.valueOf(requestMap.get(key) != null ? requestMap.get(key) : "");
     }
 
     public List<String> getList(String key) {
-        return requestMap.get(key) != null
-                ? requestMap.get(key).stream()
+        if (requestMap.get(key) instanceof List<?> list) {
+            return !list.isEmpty()
+                    ? list.stream()
                     .filter(Objects::nonNull)
                     .map(Object::toString)
                     .toList()
-                : List.of();
+                    : List.of();
+        }
+        return List.of();
     }
 
     public List<Map<String, String>> getItems() {
-        return requestMap.get(ITEMS) != null
-                ? requestMap.get(ITEMS).stream()
+        if (requestMap.get(ITEMS) instanceof List<?> items) {
+            return !items.isEmpty()
+                    ? items.stream()
                     .filter(Objects::nonNull)
                     .map(obj -> (Map<String, String>) obj)
                     .toList()
-                : List.of();
+                    : List.of();
+        }
+        return List.of();
     }
 }

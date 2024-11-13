@@ -1,6 +1,6 @@
 package com.jovisco.pdf.invoice;
 
-import com.jovisco.pdf.base.PdfBaseTemplateGeneratorDEde;
+import com.jovisco.pdf.base.PdfBaseTemplateGenerator_deDE;
 import com.jovisco.pdf.core.RequestMap;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -32,9 +32,9 @@ class PdfInvoiceDocumentTest {
     void test_create() {
         var invoiceId = requestMap.get(RequestMap.INVOICE_ID);
         var documentFilePath = "target/test-invoicedocument-" + invoiceId +".pdf";
-        var baseTemplateGenerator = new PdfBaseTemplateGeneratorDEde(requestMap);
-        var invoiceTemplateGenerator = new PdfInvoiceTemplateGeneratorDEde(requestMap);
-        var invoiceDocumentGenerator = new PdfInvoiceDocumentGeneratorDEde(requestMap);
+        var baseTemplateGenerator = new PdfBaseTemplateGenerator_deDE(requestMap);
+        var invoiceTemplateGenerator = new PdfInvoiceTemplateGenerator_deDE(requestMap);
+        var invoiceDocumentGenerator = new PdfInvoiceDocumentGenerator_deDE(requestMap);
         var document = new PdfInvoiceDocument(
                 baseTemplateGenerator, invoiceTemplateGenerator, invoiceDocumentGenerator, documentFilePath);
 
@@ -77,41 +77,41 @@ class PdfInvoiceDocumentTest {
         assertThrows(RuntimeException.class, () -> {
             var invoiceId = requestMap.get(RequestMap.INVOICE_ID);
             var documentFilePath = "NOACCESS/test-invoicedocument-" + invoiceId +".pdf";
-            var baseTemplateGenerator = new PdfBaseTemplateGeneratorDEde(requestMap);
-            var invoiceTemplateGenerator = new PdfInvoiceTemplateGeneratorDEde(requestMap);
-            var invoiceDocumentGenerator = new PdfInvoiceDocumentGeneratorDEde(requestMap);
+            var baseTemplateGenerator = new PdfBaseTemplateGenerator_deDE(requestMap);
+            var invoiceTemplateGenerator = new PdfInvoiceTemplateGenerator_deDE(requestMap);
+            var invoiceDocumentGenerator = new PdfInvoiceDocumentGenerator_deDE(requestMap);
             var document = new PdfInvoiceDocument(
                     baseTemplateGenerator, invoiceTemplateGenerator, invoiceDocumentGenerator, documentFilePath);
             document.create();
         });
     }
 
-    private Map<String, List<Object>> makeDocumentRequestMap() {
-        var requestMap = new HashMap<String, List<Object>>(40);
+    private Map<String, Object> makeDocumentRequestMap() {
+        var requestMap = new HashMap<String, Object>(40);
         // invoice template
-        requestMap.put(RequestMap.TITLE, List.of("Rechnung"));
-        requestMap.put(RequestMap.REF_TITLE, List.of("Bitte bei Zahlung angeben:"));
-        requestMap.put(RequestMap.CUSTOMER_ID_LBL, List.of("Kd.Nr."));
-        requestMap.put(RequestMap.INVOICE_ID_LBL, List.of("Re.Nr."));
-        requestMap.put(RequestMap.INVOICE_DATE_LBL, List.of("Datum"));
-        requestMap.put(RequestMap.ITEM_ID_HDR, List.of("Pos"));
-        requestMap.put(RequestMap.ITEM_QTY_HDR, List.of("Menge"));
-        requestMap.put(RequestMap.ITEM_DESC_HDR, List.of("Beschreibung"));
-        requestMap.put(RequestMap.ITEM_UNIT_NET_AMNT_HDR, List.of("Einzelpreis"));
-        requestMap.put(RequestMap.ITEM_TOTAL_NET_AMNT_HDR, List.of("Gesamtpreis"));
+        requestMap.put(RequestMap.TITLE, "Rechnung");
+        requestMap.put(RequestMap.REF_TITLE, "Bitte bei Zahlung angeben:");
+        requestMap.put(RequestMap.CUSTOMER_ID_LBL, "Kd.Nr.");
+        requestMap.put(RequestMap.INVOICE_ID_LBL, "Re.Nr.");
+        requestMap.put(RequestMap.INVOICE_DATE_LBL, "Datum");
+        requestMap.put(RequestMap.ITEM_ID_HDR, "Pos");
+        requestMap.put(RequestMap.ITEM_QTY_HDR, "Menge");
+        requestMap.put(RequestMap.ITEM_DESC_HDR, "Beschreibung");
+        requestMap.put(RequestMap.ITEM_UNIT_NET_AMNT_HDR, "Einzelpreis");
+        requestMap.put(RequestMap.ITEM_TOTAL_NET_AMNT_HDR, "Gesamtpreis");
         // invoice document
-        requestMap.put(RequestMap.INVOICE_ID, List.of("5222"));
-        requestMap.put(RequestMap.INVOICE_DATE, List.of("2.11.2024"));
-        requestMap.put(RequestMap.CUSTOMER_ID, List.of("4711"));
+        requestMap.put(RequestMap.INVOICE_ID, "5222");
+        requestMap.put(RequestMap.INVOICE_DATE, "2.11.2024");
+        requestMap.put(RequestMap.CUSTOMER_ID, "4711");
         requestMap.put(RequestMap.ADDRESS_LINES, List.of("Jovisco AG", "Kapitalstr. 123", "", "12345 Berlin"));
-        requestMap.put(RequestMap.BILLING_PERIOD, List.of("Leistungszeitraum Oktober 2024"));
-        requestMap.put(RequestMap.TOTAL_NET_AMNT_HDR, List.of("Nettobetrag"));
-        requestMap.put(RequestMap.TOTAL_VAT_AMNT_HDR, List.of("19% MwSt"));
-        requestMap.put(RequestMap.TOTAL_GROSS_AMNT_HDR, List.of("Bruttobetrag"));
-        requestMap.put(RequestMap.TOTAL_NET_AMNT, List.of("12.345,67 €"));
-        requestMap.put(RequestMap.TOTAL_VAT_AMNT, List.of("2.345,67 €"));
-        requestMap.put(RequestMap.TOTAL_GROSS_AMNT, List.of("15.678,90 €"));
-        requestMap.put(RequestMap.PAYMENT_TERMS, List.of("Zahlbar innerhalb von 30 Tagen ohne Abzug"));
+        requestMap.put(RequestMap.BILLING_PERIOD, "Leistungszeitraum Oktober 2024");
+        requestMap.put(RequestMap.TOTAL_NET_AMNT_HDR, "Nettobetrag");
+        requestMap.put(RequestMap.TOTAL_VAT_AMNT_HDR, "19% MwSt");
+        requestMap.put(RequestMap.TOTAL_GROSS_AMNT_HDR, "Bruttobetrag");
+        requestMap.put(RequestMap.TOTAL_NET_AMNT, "12.345,67 €");
+        requestMap.put(RequestMap.TOTAL_VAT_AMNT, "2.345,67 €");
+        requestMap.put(RequestMap.TOTAL_GROSS_AMNT, "15.678,90 €");
+        requestMap.put(RequestMap.PAYMENT_TERMS, "Zahlbar innerhalb von 30 Tagen ohne Abzug");
         requestMap.put(RequestMap.OPT_INVOICE_TEXTS, List.of(
                 "Bitte beachten sie den geänderten Mehrwertsteuersatz von nun 25%.",
                 "Der neue Mehrwertsteuersatz wird auf dieser Rechnung, entsprechend",

@@ -1,5 +1,6 @@
 package com.jovisco.pdf.invoice;
 
+import com.jovisco.pdf.core.PdfDocumentCreator;
 import com.jovisco.pdf.core.PdfDocumentGenerator;
 import com.jovisco.pdf.core.RequestMap;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +12,7 @@ import java.io.IOException;
 import java.util.Calendar;
 
 @RequiredArgsConstructor
-public class PdfInvoiceDocument {
+public class PdfInvoiceDocument implements PdfDocumentCreator {
 
     private final PdfDocumentGenerator baseTemplateGenerator;
     private final PdfDocumentGenerator invoiceTemplateGenerator;
