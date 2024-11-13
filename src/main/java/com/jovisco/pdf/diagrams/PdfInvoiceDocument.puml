@@ -6,6 +6,9 @@ skinparam class {
   BackgroundColor<<abstract>> #ccccff
 }
 
+class PdfInvoiceDocumentFactory {
+    + getInvoiceCreator(locale, request, filePath)
+}
 class PdfInvoiceDocument {
     {field} - baseTemplateGenerator : PdfDocumentGenerator
     {field} - InvoiceTemplateGenerator : PdfDocumentGenerator
@@ -56,6 +59,7 @@ class PdfInvoiceDocumentGeneratorDEde extends PdfInvoiceDocumentGenerator {
     {method} ...
 }
 
-PdfInvoiceDocument o-- PdfDocumentGenerator : uses
+PdfInvoiceDocumentFactory -d-> PdfInvoiceDocument : instantiates
+PdfInvoiceDocument o--> PdfDocumentGenerator
 
 @enduml

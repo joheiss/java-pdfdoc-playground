@@ -29,6 +29,6 @@ class PdfBaseTemplateGeneratorDEde extends PdfBaseTemplateGenerator {
     {method} ...
 }
 
-PdfBaseTemplate o-- PdfDocumentGenerator : uses
+PdfBaseTemplate o--> PdfDocumentGenerator
 
 @enduml
