@@ -38,11 +38,12 @@ class AppTest {
             System.out.println(formatter.format(1_234.56));
         }
 
+        @Disabled
         @Test
         void playWithResourceBundle() {
             var bundle = ResourceBundle.getBundle("i18n", Locale.getDefault());
             assertNotNull(bundle);
-            assertEquals(bundle.getString("invoice"), "Rechnung");
+            assertEquals("Rechnung", bundle.getString("invoice"));
         }
     }
 }

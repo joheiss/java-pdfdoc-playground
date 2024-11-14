@@ -1,4 +1,4 @@
-package com.jovisco.pdf;
+package com.jovisco.pdf.architecture;
 
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;

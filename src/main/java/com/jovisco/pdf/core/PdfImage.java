@@ -6,8 +6,11 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class PdfImage implements PdfElement {
 
@@ -29,8 +32,8 @@ public class PdfImage implements PdfElement {
        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
            var future = executor.submit(() ->
                    PDImageXObject.createFromFile(imagePath.toAbsolutePath().toString(), doc));
-           return future.get();
-       } catch (ExecutionException | InterruptedException e) {
+           return future.get(500, TimeUnit.MILLISECONDS);
+       } catch (ExecutionException | InterruptedException | TimeoutException e) {
            throw new PdfImageLoadingException(e.getMessage());
        }
    }
