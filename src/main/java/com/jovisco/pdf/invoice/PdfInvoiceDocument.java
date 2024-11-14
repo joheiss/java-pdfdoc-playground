@@ -1,6 +1,7 @@
 package com.jovisco.pdf.invoice;
 
 import com.jovisco.pdf.core.PdfDocumentCreator;
+import com.jovisco.pdf.core.PdfDocumentException;
 import com.jovisco.pdf.core.PdfDocumentGenerator;
 import com.jovisco.pdf.core.RequestMap;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class PdfInvoiceDocument implements PdfDocumentCreator {
             fillMetaInformation(document);
             document.save(filePath);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new PdfDocumentException(e.getMessage());
         }
     }
 

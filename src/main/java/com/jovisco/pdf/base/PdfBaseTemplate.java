@@ -1,6 +1,7 @@
 package com.jovisco.pdf.base;
 
 import com.jovisco.pdf.core.PdfDocumentCreator;
+import com.jovisco.pdf.core.PdfDocumentException;
 import com.jovisco.pdf.core.PdfDocumentGenerator;
 import lombok.RequiredArgsConstructor;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -24,7 +25,7 @@ public class PdfBaseTemplate implements PdfDocumentCreator {
             fillMetaInformation(template);
             template.save(filePath);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new PdfDocumentException(e.getMessage());
         }
     }
 

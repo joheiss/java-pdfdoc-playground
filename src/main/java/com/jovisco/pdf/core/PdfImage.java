@@ -31,7 +31,7 @@ public class PdfImage implements PdfElement {
                    PDImageXObject.createFromFile(imagePath.toAbsolutePath().toString(), doc));
            return future.get();
        } catch (ExecutionException | InterruptedException e) {
-           throw new RuntimeException(e);
+           throw new PdfImageLoadingException(e.getMessage());
        }
    }
 

@@ -2,6 +2,7 @@ package com.jovisco.pdf.invoice;
 
 import com.jovisco.pdf.shared.CreatePdfInvoiceItemRequest;
 import com.jovisco.pdf.shared.CreatePdfInvoiceRequest;
+import com.jovisco.pdf.shared.PdfInvoiceDocumentFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

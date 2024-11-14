@@ -1,10 +1,10 @@
-package com.jovisco.pdf.invoice;
+package com.jovisco.pdf.shared;
 
 import com.jovisco.pdf.base.PdfBaseTemplateGenerator_deDE;
 import com.jovisco.pdf.core.PdfDocumentCreator;
-import com.jovisco.pdf.core.RequestMap;
-import com.jovisco.pdf.shared.CreatePdfInvoiceRequest;
-import com.jovisco.pdf.shared.PdfInvoiceRequestAdapter_deDE;
+import com.jovisco.pdf.invoice.PdfInvoiceDocument;
+import com.jovisco.pdf.invoice.PdfInvoiceDocumentGenerator_deDE;
+import com.jovisco.pdf.invoice.PdfInvoiceTemplateGenerator_deDE;
 
 import java.util.Locale;
 

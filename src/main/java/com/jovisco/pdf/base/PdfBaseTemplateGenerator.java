@@ -42,7 +42,7 @@ public abstract class PdfBaseTemplateGenerator implements PdfDocumentGenerator {
             generateContent();
             return template;
         } catch (IOException | URISyntaxException e) {
-            throw new RuntimeException(e);
+            throw new PdfDocumentException(e.getMessage());
         }
     }
 

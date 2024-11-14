@@ -36,7 +36,7 @@ public abstract class PdfInvoiceTemplateGenerator implements PdfDocumentGenerato
             generateContent();
             return template;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new PdfDocumentException(e.getMessage());
         }
     }
 
