@@ -2,13 +2,17 @@ package com.jovisco.pdf.invoice;
 
 import com.jovisco.pdf.base.PdfBaseTemplateGenerator_deDE;
 import com.jovisco.pdf.core.RequestMap;
+import lombok.SneakyThrows;
 import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdfwriter.compress.CompressParameters;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -26,6 +30,7 @@ class PdfInvoiceDocumentTest {
         requestMap = new RequestMap(makeDocumentRequestMap());
     }
 
+    @SneakyThrows
     @Order(30)
     @Test
     @DisplayName("should create a invoice document pdf and save it at the given path")
@@ -40,6 +45,7 @@ class PdfInvoiceDocumentTest {
 
         document.create();
     }
+
     @Order(31)
     @Test
     @DisplayName("should be accessible and contain predefined text blocks")

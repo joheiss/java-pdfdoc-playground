@@ -4,8 +4,11 @@ import com.jovisco.pdf.core.*;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.pdmodel.font.PDType0Font;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,6 +28,7 @@ public abstract class PdfBaseTemplateGenerator implements PdfDocumentGenerator {
 
     protected final RequestMap requestMap;
 
+    protected PDType0Font font;
     protected PDDocument template;
     protected PDPage page;
     protected PDPageContentStream cs;
@@ -39,6 +43,8 @@ public abstract class PdfBaseTemplateGenerator implements PdfDocumentGenerator {
         try {
             this.template = template;
             this.page = this.template.getPage(0);
+            InputStream fontStream = PdfBaseTemplate.class.getResourceAsStream("/ArialMT.ttf");
+            this.font = PDType0Font.load(template, fontStream);
             generateContent();
             return template;
         } catch (IOException | URISyntaxException e) {
@@ -69,6 +75,7 @@ public abstract class PdfBaseTemplateGenerator implements PdfDocumentGenerator {
 
         try (var cs = new PDPageContentStream(template, page)) {
             this.cs = cs;
+            this.cs.setFont(font, 12 );
             var block = new PdfBlock(
                     generateHeaderImage(),
                     generateAddressLineImage(),

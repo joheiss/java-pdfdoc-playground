@@ -2,13 +2,14 @@ package com.jovisco.pdf.invoice;
 
 import com.jovisco.pdf.core.*;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDType0Font;
 
 import java.util.Map;
 
 public class PdfInvoiceItemsBlockGenerator extends PdfBlockGenerator {
 
-    public PdfInvoiceItemsBlockGenerator(RequestMap requestMap, PDPageContentStream cs, PdfPosY posY) {
-        super(requestMap, cs, posY);
+    public PdfInvoiceItemsBlockGenerator(RequestMap requestMap, PDPageContentStream cs, PDType0Font font,PdfPosY posY) {
+        super(requestMap, cs, font, posY);
     }
 
     @Override
@@ -38,7 +39,7 @@ public class PdfInvoiceItemsBlockGenerator extends PdfBlockGenerator {
                 .font(font)
                 .colorRGB(TEXT_COLOR)
                 .text(itemId)
-                .dimensions(PdfDimensions.ofA4mm(itemX, posY.getY(), 5.0f, 12.0f))
+                .dimensions(PdfDimensions.ofA4mm(itemX, posY.getY(), 5.0f, 11.0f))
                 .build();
     }
 
@@ -49,12 +50,12 @@ public class PdfInvoiceItemsBlockGenerator extends PdfBlockGenerator {
                 .font(font)
                 .colorRGB(TEXT_COLOR)
                 .text(quantity)
-                .dimensions(PdfDimensions.ofA4mm(itemX, posY.getY(), 10.0f, 12.0f))
+                .dimensions(PdfDimensions.ofA4mm(itemX, posY.getY(), 10.0f, 11.0f))
                 .build();
     }
 
     protected PdfElement generateItemDescription(String description) {
-        var fontSize = 12.0f - (float) (description.length() / 35);
+        var fontSize = 11.0f - (float) (description.length() / 35);
         return PdfText.builder()
                 .contentStream(cs)
                 .font(font)
@@ -71,7 +72,7 @@ public class PdfInvoiceItemsBlockGenerator extends PdfBlockGenerator {
                 .font(font)
                 .colorRGB(TEXT_COLOR)
                 .text(amount)
-                .dimensions(PdfDimensions.ofA4mm(itemX, posY.getY(), 20.0f, 12.0f))
+                .dimensions(PdfDimensions.ofA4mm(itemX, posY.getY(), 20.0f, 11.0f))
                 .build();
     }
 
@@ -82,7 +83,7 @@ public class PdfInvoiceItemsBlockGenerator extends PdfBlockGenerator {
                 .font(font)
                 .colorRGB(TEXT_COLOR)
                 .text(amount)
-                .dimensions(PdfDimensions.ofA4mm(itemX, posY.getY(), 25.0f, 12.0f))
+                .dimensions(PdfDimensions.ofA4mm(itemX, posY.getY(), 25.0f, 11.0f))
                 .build();
     }
 }

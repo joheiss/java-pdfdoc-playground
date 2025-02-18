@@ -2,11 +2,12 @@ package com.jovisco.pdf.invoice;
 
 import com.jovisco.pdf.core.*;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDType0Font;
 
 public class PdfInvoiceReferenceBlockGenerator extends PdfBlockGenerator {
 
-    public PdfInvoiceReferenceBlockGenerator(RequestMap requestMap, PDPageContentStream cs, PdfPosY posY) {
-        super(requestMap, cs, posY);
+    public PdfInvoiceReferenceBlockGenerator(RequestMap requestMap, PDPageContentStream cs, PDType0Font font, PdfPosY posY) {
+        super(requestMap, cs, font, posY);
     }
 
     @Override
@@ -24,7 +25,7 @@ public class PdfInvoiceReferenceBlockGenerator extends PdfBlockGenerator {
         return PdfText.builder()
                 .contentStream(cs)
                 .text(requestMap.get(RequestMap.INVOICE_ID))
-                .dimensions(PdfDimensions.ofA4mm(167.0f, posY.getY(), 30.0f, 12.0f))
+                .dimensions(PdfDimensions.ofA4mm(167.0f, posY.getY(), 30.0f, 11.0f))
                 .colorRGB(TEXT_COLOR)
                 .build();
     }
@@ -33,7 +34,7 @@ public class PdfInvoiceReferenceBlockGenerator extends PdfBlockGenerator {
         return PdfText.builder()
                 .contentStream(cs)
                 .text(requestMap.get(RequestMap.CUSTOMER_ID))
-                .dimensions(PdfDimensions.ofA4mm(167.0f, posY.getY(), 30.0f, 12.0f))
+                .dimensions(PdfDimensions.ofA4mm(167.0f, posY.getY(), 30.0f, 11.0f))
                 .colorRGB(TEXT_COLOR)
                 .build();
     }
@@ -42,7 +43,7 @@ public class PdfInvoiceReferenceBlockGenerator extends PdfBlockGenerator {
         return PdfText.builder()
                 .contentStream(cs)
                 .text(requestMap.get(RequestMap.INVOICE_DATE))
-                .dimensions(PdfDimensions.ofA4mm(167.0f, posY.getY(), 30.0f, 12.0f))
+                .dimensions(PdfDimensions.ofA4mm(167.0f, posY.getY(), 30.0f, 11.0f))
                 .colorRGB(TEXT_COLOR)
                 .build();
     }

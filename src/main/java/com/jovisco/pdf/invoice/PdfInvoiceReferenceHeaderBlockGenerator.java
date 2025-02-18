@@ -2,13 +2,14 @@ package com.jovisco.pdf.invoice;
 
 import com.jovisco.pdf.core.*;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDType0Font;
 
 public class PdfInvoiceReferenceHeaderBlockGenerator extends PdfBlockGenerator {
 
-    protected final static float REFERENCE_UNDERLINE_WIDTH = 38.0f * PdfDimensions.PAGE_WIDTH_FACTOR;
+    protected final static float REFERENCE_UNDERLINE_WIDTH = 44.0f * PdfDimensions.PAGE_WIDTH_FACTOR;
 
-    public PdfInvoiceReferenceHeaderBlockGenerator(RequestMap requestMap, PDPageContentStream cs, PdfPosY posY) {
-        super(requestMap, cs, posY);
+    public PdfInvoiceReferenceHeaderBlockGenerator(RequestMap requestMap, PDPageContentStream cs, PDType0Font font, PdfPosY posY) {
+        super(requestMap, cs, font, posY);
     }
 
     @Override
@@ -57,6 +58,7 @@ public class PdfInvoiceReferenceHeaderBlockGenerator extends PdfBlockGenerator {
                 .contentStream(cs)
                 .text(requestMap.get(RequestMap.INVOICE_ID_LBL))
                 .dimensions(PdfDimensions.ofA4mm(150.0f, posY.getY(), 30.0f, 12.0f))
+                .font(font)
                 .colorRGB(TEMPLATE_COLOR)
                 .build();
     }
@@ -66,6 +68,7 @@ public class PdfInvoiceReferenceHeaderBlockGenerator extends PdfBlockGenerator {
                 .contentStream(cs)
                 .text(requestMap.get(RequestMap.CUSTOMER_ID_LBL))
                 .dimensions(PdfDimensions.ofA4mm(150.0f, posY.getY(), 30.0f, 12.0f))
+                .font(font)
                 .colorRGB(TEMPLATE_COLOR)
                 .build();
     }
@@ -75,6 +78,7 @@ public class PdfInvoiceReferenceHeaderBlockGenerator extends PdfBlockGenerator {
                 .contentStream(cs)
                 .text(requestMap.get(RequestMap.INVOICE_DATE_LBL))
                 .dimensions(PdfDimensions.ofA4mm(150.0f, posY.getY(), 30.0f, 12.0f))
+                .font(font)
                 .colorRGB(TEMPLATE_COLOR)
                 .build();
     }

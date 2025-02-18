@@ -8,6 +8,7 @@ public record CreatePdfInvoiceRequest(
         LocalDate invoiceDate,
         int customerId,
         List<String> address,
+        int contractId,
         String billingPeriod,
         String currencyCode,
         double vatPercentage,
@@ -15,6 +16,7 @@ public record CreatePdfInvoiceRequest(
         double totalNetAmount,
         double totalVatAmount,
         double totalGrossAmount,
-        String paymentTerms
+        String paymentTerms,
+        String invoiceText
 ) {
 }

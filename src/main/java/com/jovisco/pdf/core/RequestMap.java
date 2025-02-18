@@ -19,6 +19,7 @@ public class RequestMap {
     public static final String ITEM_TOTAL_NET_AMNT_HDR= "itemTotalNetAmountHeader";
 
     // invoice document
+    public static final String CURRENCY_CODE = "currencyCode";
     public static final String INVOICE_ID = "invoiceId";
     public static final String CUSTOMER_ID = "customerId";
     public static final String INVOICE_DATE = "invoiceDate";

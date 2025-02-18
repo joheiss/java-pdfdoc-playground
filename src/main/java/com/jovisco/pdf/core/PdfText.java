@@ -1,7 +1,7 @@
 package com.jovisco.pdf.core;
 
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.PDType0Font;
 
 import java.io.IOException;
 
@@ -10,19 +10,19 @@ public class PdfText implements PdfElement {
     private final PDPageContentStream cs;
     private final String text;
     private final PdfDimensions dimensions;
-    private PDType1Font font = null;
+    private PDType0Font font = null;
     private float[] color = null;
 
     public static PdfTextBuilder builder() {
         return new PdfTextBuilder();
     }
 
-    public PdfText(PDPageContentStream cs, String text, PdfDimensions dimensions, PDType1Font font, int[] color) {
+    public PdfText(PDPageContentStream cs, String text, PdfDimensions dimensions, PDType0Font font, int[] color) {
         this(cs, text, dimensions, font);
         if (color != null) this.color = new float[]{color[0]/255.0f, color[1]/255.0f, color[2]/255.0f};
     }
 
-    public PdfText(PDPageContentStream cs, String text, PdfDimensions dimensions, PDType1Font font) {
+    public PdfText(PDPageContentStream cs, String text, PdfDimensions dimensions, PDType0Font font) {
         this(cs, text, dimensions);
         this.font = font;
     }

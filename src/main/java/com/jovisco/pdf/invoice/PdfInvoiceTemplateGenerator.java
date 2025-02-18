@@ -1,22 +1,23 @@
 package com.jovisco.pdf.invoice;
 
+import com.jovisco.pdf.base.PdfBaseTemplate;
 import com.jovisco.pdf.core.*;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.PDPageContentStream.AppendMode;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
+import org.apache.pdfbox.pdmodel.font.PDType0Font;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 public abstract class PdfInvoiceTemplateGenerator implements PdfDocumentGenerator {
 
     protected static final int[] TEMPLATE_COLOR = {1, 94, 104};
-    protected static final PDType1Font font = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
 
     protected final RequestMap requestMap;
 
+    protected PDType0Font font;
     protected PDDocument template;
     protected PDPage page;
     protected PDPageContentStream cs;
@@ -33,6 +34,8 @@ public abstract class PdfInvoiceTemplateGenerator implements PdfDocumentGenerato
         try {
             this.template = template;
             this.page = template.getPage(0);
+            InputStream fontStream = PdfBaseTemplate.class.getResourceAsStream("/ArialMT.ttf");
+            this.font = PDType0Font.load(template, fontStream);
             generateContent();
             return template;
         } catch (IOException e) {
@@ -44,6 +47,7 @@ public abstract class PdfInvoiceTemplateGenerator implements PdfDocumentGenerato
 
         try (var cs = new PDPageContentStream(template, page, AppendMode.APPEND, false, true)) {
             this.cs = cs;
+            this.cs.setFont( font, 12 );
             var blocks = new PdfBlock(
                 generateInvoiceTitle(),
                 generateReferenceTitleAndLabel(),
@@ -58,7 +62,7 @@ public abstract class PdfInvoiceTemplateGenerator implements PdfDocumentGenerato
         return PdfText.builder()
                 .contentStream(cs)
                 .text(requestMap.get(RequestMap.TITLE))
-                .dimensions(PdfDimensions.ofA4mm(26.0f, posY.getY(), 40.0f, 24.0f))
+                .dimensions(PdfDimensions.ofA4mm(26.0f, posY.getY(), 40.0f, 20.0f))
                 .font(font)
                 .colorRGB(TEMPLATE_COLOR)
                 .build();
@@ -66,13 +70,13 @@ public abstract class PdfInvoiceTemplateGenerator implements PdfDocumentGenerato
 
     protected PdfElement generateReferenceTitleAndLabel() {
         posY.setY(96.0f);
-        referenceHeaderBlockGenerator = new PdfInvoiceReferenceHeaderBlockGenerator(requestMap, cs, posY);
+        referenceHeaderBlockGenerator = new PdfInvoiceReferenceHeaderBlockGenerator(requestMap, cs, font, posY);
         return referenceHeaderBlockGenerator.generate();
     }
 
     protected PdfElement generateItemsHeaderBlock() {
         posY.setY(124.0f);
-        itemsHeaderBlockGenerator = new PdfInvoiceItemsHeaderBlockGenerator(requestMap, cs, posY);
+        itemsHeaderBlockGenerator = new PdfInvoiceItemsHeaderBlockGenerator(requestMap, cs, font, posY);
         return itemsHeaderBlockGenerator.generate();
     }
 }

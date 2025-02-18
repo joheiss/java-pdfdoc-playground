@@ -1,14 +1,14 @@
 package com.jovisco.pdf.core;
 
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.PDType0Font;
 
 public class PdfTextBuilder {
 
     private PDPageContentStream contentStream;
     private String text;
     private PdfDimensions dimensions;
-    private PDType1Font font;
+    private PDType0Font font;
     private int[] colorRGB;
 
     PdfTextBuilder() {}
@@ -32,7 +32,7 @@ public class PdfTextBuilder {
         return this;
     }
 
-    public PdfTextBuilder font(PDType1Font font) {
+    public PdfTextBuilder font(PDType0Font font) {
         this.font = font;
         return this;
     }

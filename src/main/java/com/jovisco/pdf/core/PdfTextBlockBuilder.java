@@ -1,7 +1,7 @@
 package com.jovisco.pdf.core;
 
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.PDType0Font;
 
 import java.util.List;
 
@@ -10,7 +10,7 @@ public class PdfTextBlockBuilder {
     private PDPageContentStream contentStream;
     private List<String> textLines;
     private PdfDimensions dimensions;
-    private PDType1Font font;
+    private PDType0Font font;
     private int[] colorRGB;
     private float leading;
 
@@ -36,7 +36,7 @@ public class PdfTextBlockBuilder {
         return this;
     }
 
-    public PdfTextBlockBuilder font(PDType1Font font) {
+    public PdfTextBlockBuilder font(PDType0Font font) {
         this.font = font;
         return this;
     }

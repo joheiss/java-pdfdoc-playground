@@ -2,11 +2,14 @@ package com.jovisco.pdf.invoice;
 
 import com.jovisco.pdf.core.*;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDType0Font;
 
 public class PdfInvoiceItemsHeaderBlockGenerator extends PdfBlockGenerator {
 
-    public PdfInvoiceItemsHeaderBlockGenerator(RequestMap requestMap, PDPageContentStream cs, PdfPosY posY) {
-        super(requestMap, cs, posY);
+    public PdfInvoiceItemsHeaderBlockGenerator(
+            RequestMap requestMap, PDPageContentStream cs, PDType0Font font, PdfPosY posY
+    ) {
+        super(requestMap, cs, font, posY);
     }
 
     @Override

@@ -2,11 +2,12 @@ package com.jovisco.pdf.invoice;
 
 import com.jovisco.pdf.core.*;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDType0Font;
 
 public class PdfInvoiceItemsTotalsBlockGenerator extends PdfBlockGenerator {
 
-    public PdfInvoiceItemsTotalsBlockGenerator(RequestMap requestMap, PDPageContentStream cs, PdfPosY posY) {
-        super(requestMap, cs, posY);
+    public PdfInvoiceItemsTotalsBlockGenerator(RequestMap requestMap, PDPageContentStream cs, PDType0Font font,PdfPosY posY) {
+        super(requestMap, cs, font, posY);
     }
 
     @Override
@@ -86,7 +87,7 @@ public class PdfInvoiceItemsTotalsBlockGenerator extends PdfBlockGenerator {
                 .font(font)
                 .colorRGB(TEXT_COLOR)
                 .text(totalNetAmount)
-                .dimensions(PdfDimensions.ofA4mm(posX, posY.getY(), 25.0f, 12.0f))
+                .dimensions(PdfDimensions.ofA4mm(posX, posY.getY(), 25.0f, 11.0f))
                 .build();
     }
 
@@ -99,7 +100,7 @@ public class PdfInvoiceItemsTotalsBlockGenerator extends PdfBlockGenerator {
                 .font(font)
                 .colorRGB(TEXT_COLOR)
                 .text(totalVatAmount)
-                .dimensions(PdfDimensions.ofA4mm(posX, posY.getY(), 25.0f, 12.0f))
+                .dimensions(PdfDimensions.ofA4mm(posX, posY.getY(), 25.0f, 11.0f))
                 .build();
     }
 
@@ -112,7 +113,7 @@ public class PdfInvoiceItemsTotalsBlockGenerator extends PdfBlockGenerator {
                 .font(font)
                 .colorRGB(TEXT_COLOR)
                 .text(totalGrossAmount)
-                .dimensions(PdfDimensions.ofA4mm(posX, posY.getY(), 25.0f, 12.0f))
+                .dimensions(PdfDimensions.ofA4mm(posX, posY.getY(), 25.0f, 11.0f))
                 .build();
     }
 }
