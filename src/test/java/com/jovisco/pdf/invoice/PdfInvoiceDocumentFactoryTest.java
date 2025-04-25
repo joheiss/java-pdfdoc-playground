@@ -28,7 +28,7 @@ class PdfInvoiceDocumentFactoryTest {
     @DisplayName("should create an X-Invoice")
     void test_class_creation() {
         var request = makeCreateInvoiceDocumentRequest();
-        var filePath = "target/test-TR" + request.invoiceId() + ".pdf";
+        var filePath = "target/R" + request.invoiceId() + ".pdf";
         var creator = new PdfInvoiceDocumentFactory().getInvoiceCreator(
                 Locale.getDefault(),
                 request,
@@ -44,7 +44,7 @@ class PdfInvoiceDocumentFactoryTest {
     @Test@DisplayName("should be able to read all relevant data from the X- Invoice")
     void test_read_x_invoice() {
         var request = makeCreateInvoiceDocumentRequest();
-        var filePath = "target/test-TR" + request.invoiceId() + "_X.pdf";
+        var filePath = "target/R" + request.invoiceId() + "_X.pdf";
         ZUGFeRDInvoiceImporter zii = new ZUGFeRDInvoiceImporter(filePath);
         try {
             Invoice invoice = zii.extractInvoice();
@@ -58,7 +58,7 @@ class PdfInvoiceDocumentFactoryTest {
             log.info("Due Payable: {}", tc.getDuePayable());
             log.info("Allowance Total: {}", tc.getAllowanceTotal());
             log.info("Grand Total: {}", tc.getGrandTotal());
-            assertEquals(new BigDecimal("17270.11"), tc.getGrandTotal());
+            assertEquals(new BigDecimal("9805.60"), tc.getGrandTotal());
         } catch (XPathExpressionException | ParseException e) {
             throw new RuntimeException(e);
         }
@@ -67,27 +67,24 @@ class PdfInvoiceDocumentFactoryTest {
     private CreatePdfInvoiceRequest makeCreateInvoiceDocumentRequest() {
 
         return new CreatePdfInvoiceRequest(
-                5277,
-                LocalDate.of(2024, 11, 24),
-                1007,
-                List.of("Schniedelwutz AG", "", "Postfach 1234", "77777 Schwieberdingen"),
-                4412,
-                "Leistungszeitraum Oktober 2024",
+                5213,
+                LocalDate.of(2025, 5, 2),
+                1014,
+                List.of("DEED Consulting GmbH", "", "Karl-Benz-Str. 9", "40764 Langenfeld(Rhld.)"),
+                4130,
+                "PVRA250327FJH - Leistungszeitraum April 2025",
                 "EUR",
                 19.0,
-                List.of(new CreatePdfInvoiceItemRequest(1,100,"Arbeitsstunden im Projekt XYZ", 123.45, 12345.00),
-                        new CreatePdfInvoiceItemRequest(2,10,"Reisestunden im Projekt XYZ", 66.77, 667.70),
-                        new CreatePdfInvoiceItemRequest(3,2,"Übernachtungen", 100.00, 200.00),
-                        new CreatePdfInvoiceItemRequest(4,1000,"Gefahrene Km", 1.30, 1300.00)
+                List.of(new CreatePdfInvoiceItemRequest(1,112,"Arbeitsstunden (remote)", 70.00, 7840.00),
+                        new CreatePdfInvoiceItemRequest(2,5,"Arbeitsstunden am Kundenstandort", 80.00, 400.00)
                         ),
-                14500.00,
-                3500.00,
-                18000.00,
-                "Zahlbar innerhalb von 30 Tagen ohne Abzug",
+                8240.00,
+                1565.60,
+                9805.60,
+                "Zahlbar innerhalb von 45 Tagen ohne Abzug",
+                "PVRA250327FJH",
                 """
-                    Bitte beachten sie den geänderten Mehrwertsteuersatz von nun 25%. Der neue Mehrwertsteuersatz wird 
-                    auf dieser Rechnung, entsprechend dem gesetzlichen Stichtag, bereits angewendet.
-                    """
+                   """
         );
     }
 

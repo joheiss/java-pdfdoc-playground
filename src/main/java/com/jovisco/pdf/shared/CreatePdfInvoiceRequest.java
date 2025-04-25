@@ -17,6 +17,7 @@ public record CreatePdfInvoiceRequest(
         double totalVatAmount,
         double totalGrossAmount,
         String paymentTerms,
+        String referenceNumber,
         String invoiceText
 ) {
 }

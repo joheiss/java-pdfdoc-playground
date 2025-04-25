@@ -36,7 +36,7 @@ class PdfInvoiceDocumentTest {
     @DisplayName("should create a invoice document pdf and save it at the given path")
     void test_create() {
         var invoiceId = requestMap.get(RequestMap.INVOICE_ID);
-        var documentFilePath = "target/test-invoicedocument-" + invoiceId +".pdf";
+        var documentFilePath = "target/R" + invoiceId +".pdf";
         var baseTemplateGenerator = new PdfBaseTemplateGenerator_deDE(requestMap);
         var invoiceTemplateGenerator = new PdfInvoiceTemplateGenerator_deDE(requestMap);
         var invoiceDocumentGenerator = new PdfInvoiceDocumentGenerator_deDE(requestMap);
@@ -51,7 +51,7 @@ class PdfInvoiceDocumentTest {
     @DisplayName("should be accessible and contain predefined text blocks")
     void should_contain_predefined_text_blocks() {
         var invoiceId = requestMap.get(RequestMap.INVOICE_ID);
-        var documentFilePath = "target/test-invoicedocument-" + invoiceId +".pdf";
+        var documentFilePath = "target/R" + invoiceId +".pdf";
         try (var doc = Loader.loadPDF(new File(documentFilePath))) {
             var pdfStripper = new PDFTextStripper();
             //Retrieving text from PDF document
@@ -106,53 +106,53 @@ class PdfInvoiceDocumentTest {
         requestMap.put(RequestMap.ITEM_UNIT_NET_AMNT_HDR, "Einzelpreis");
         requestMap.put(RequestMap.ITEM_TOTAL_NET_AMNT_HDR, "Gesamtpreis");
         // invoice document
-        requestMap.put(RequestMap.INVOICE_ID, "5222");
-        requestMap.put(RequestMap.INVOICE_DATE, "2.11.2024");
-        requestMap.put(RequestMap.CUSTOMER_ID, "4711");
-        requestMap.put(RequestMap.ADDRESS_LINES, List.of("Jovisco AG", "Kapitalstr. 123", "", "12345 Berlin"));
-        requestMap.put(RequestMap.BILLING_PERIOD, "Leistungszeitraum Oktober 2024");
+        requestMap.put(RequestMap.INVOICE_ID, "5212");
+        requestMap.put(RequestMap.INVOICE_DATE, "2.5.2025");
+        requestMap.put(RequestMap.CUSTOMER_ID, "1014");
+        requestMap.put(RequestMap.ADDRESS_LINES, List.of("DEED Consulting GmbH", "", "Karl-Benz-Str. 9", "40764 Langenfeld(Rhld.)"));
+        requestMap.put(RequestMap.BILLING_PERIOD, "PVRA250327FJH - Leistungszeitraum April 2025");
         requestMap.put(RequestMap.TOTAL_NET_AMNT_HDR, "Nettobetrag");
         requestMap.put(RequestMap.TOTAL_VAT_AMNT_HDR, "19% MwSt");
         requestMap.put(RequestMap.TOTAL_GROSS_AMNT_HDR, "Bruttobetrag");
-        requestMap.put(RequestMap.TOTAL_NET_AMNT, "12.345,67 €");
-        requestMap.put(RequestMap.TOTAL_VAT_AMNT, "2.345,67 €");
-        requestMap.put(RequestMap.TOTAL_GROSS_AMNT, "15.678,90 €");
-        requestMap.put(RequestMap.PAYMENT_TERMS, "Zahlbar innerhalb von 30 Tagen ohne Abzug");
-        requestMap.put(RequestMap.OPT_INVOICE_TEXTS, List.of(
-                "Bitte beachten sie den geänderten Mehrwertsteuersatz von nun 25%.",
-                "Der neue Mehrwertsteuersatz wird auf dieser Rechnung, entsprechend",
-                "dem gesetzlichen Stichtag, bereits angewendet."));
+        requestMap.put(RequestMap.TOTAL_NET_AMNT, "8.240,00 €");
+        requestMap.put(RequestMap.TOTAL_VAT_AMNT, "1.565,60 €");
+        requestMap.put(RequestMap.TOTAL_GROSS_AMNT, "9.805,60 €");
+        requestMap.put(RequestMap.PAYMENT_TERMS, "Zahlbar innerhalb von 45 Tagen ohne Abzug");
+        // requestMap.put(RequestMap.OPT_INVOICE_TEXTS, List.of(
+        //        "Bitte beachten sie den geänderten Mehrwertsteuersatz von nun 25%.",
+        //        "Der neue Mehrwertsteuersatz wird auf dieser Rechnung, entsprechend",
+        //        "dem gesetzlichen Stichtag, bereits angewendet."));
 
         requestMap.put(RequestMap.ITEMS,
                 List.of(
                         Map.of(
                                 RequestMap.ITEM_ID, "1",
-                                RequestMap.ITEM_QTY, "123,5",
-                                RequestMap.ITEM_DESC, "Projektstunden im Projekt \"Rettet die Welt\"",
-                                RequestMap.ITEM_UNIT_NET_AMNT, "123,45 €",
-                                RequestMap.ITEM_TOTAL_NET_AMNT, "12.345,67 €"
+                                RequestMap.ITEM_QTY, "112",
+                                RequestMap.ITEM_DESC, "Arbeitsstunden (remote)",
+                                RequestMap.ITEM_UNIT_NET_AMNT, "70,00 €",
+                                RequestMap.ITEM_TOTAL_NET_AMNT, "7.840,00 €"
                         ),
                         Map.of(
                                 RequestMap.ITEM_ID, "2",
-                                RequestMap.ITEM_QTY, "23",
-                                RequestMap.ITEM_DESC, "Reisestunden im Projekt \"Rettet die Welt\"",
-                                RequestMap.ITEM_UNIT_NET_AMNT, "66,18 €",
-                                RequestMap.ITEM_TOTAL_NET_AMNT, "1.234,56 €"
-                        ),
-                        Map.of(
-                                RequestMap.ITEM_ID, "3",
-                                RequestMap.ITEM_QTY, "2",
-                                RequestMap.ITEM_DESC, "Übernachtungen im Hotel",
-                                RequestMap.ITEM_UNIT_NET_AMNT, "150,00 €",
-                                RequestMap.ITEM_TOTAL_NET_AMNT, "300,00 €"
-                        ),
-                        Map.of(
-                                RequestMap.ITEM_ID, "4",
-                                RequestMap.ITEM_QTY, "765",
-                                RequestMap.ITEM_DESC, "Gefahrene Km",
-                                RequestMap.ITEM_UNIT_NET_AMNT, "0,60 €",
-                                RequestMap.ITEM_TOTAL_NET_AMNT, "488,00 €"
+                                RequestMap.ITEM_QTY, "5",
+                                RequestMap.ITEM_DESC, "Arbeitsstunden am Kundenstandort",
+                                RequestMap.ITEM_UNIT_NET_AMNT, "80,00 €",
+                                RequestMap.ITEM_TOTAL_NET_AMNT, "400,00 €"
                         )
+//                        Map.of(
+//                                RequestMap.ITEM_ID, "3",
+//                                RequestMap.ITEM_QTY, "2",
+//                                RequestMap.ITEM_DESC, "Übernachtungen im Hotel",
+//                                RequestMap.ITEM_UNIT_NET_AMNT, "150,00 €",
+//                                RequestMap.ITEM_TOTAL_NET_AMNT, "300,00 €"
+//                        ),
+//                        Map.of(
+//                                RequestMap.ITEM_ID, "4",
+//                                RequestMap.ITEM_QTY, "765",
+//                                RequestMap.ITEM_DESC, "Gefahrene Km",
+//                                RequestMap.ITEM_UNIT_NET_AMNT, "0,60 €",
+//                                RequestMap.ITEM_TOTAL_NET_AMNT, "488,00 €"
+//                        )
                 ));
 
         return requestMap;

@@ -70,8 +70,8 @@ public class XInvoiceDocument {
         var deliveryDateTo = deliveryDate;
         invoice.setDetailedDeliveryPeriodFrom(fromLocalDate(deliveryDateFrom));
         invoice.setDetailedDeliveryPeriodTo(fromLocalDate(deliveryDateTo));
-        invoice.setPaymentTermDescription("30 Tage netto");
-        invoice.setDueDate(fromLocalDate(request.invoiceDate().plusDays(30)));
+        invoice.setPaymentTermDescription("45 Tage netto");
+        invoice.setDueDate(fromLocalDate(request.invoiceDate().plusDays(45)));
         request.items().stream().forEach(i -> {
             var item = new Item();
             item.setQuantity(BigDecimal.valueOf(i.quantity()));
@@ -89,7 +89,7 @@ public class XInvoiceDocument {
             invoice.addItem(item);
         });
         invoice.addCustomsNote(request.invoiceText());
-        invoice.setContractReferencedDocument(String.valueOf(request.contractId()));
+        invoice.setContractReferencedDocument(String.valueOf(request.referenceNumber()));
         return invoice;
     }
 
