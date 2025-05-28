@@ -51,7 +51,7 @@ public class PdfInvoiceRequestAdapter_deDE {
             itemMap.put(RequestMap.ITEM_QTY, df.format(item.quantity()));
             itemMap.put(RequestMap.ITEM_DESC, item.description());
             itemMap.put(RequestMap.ITEM_UNIT_NET_AMNT, formatter.format(item.unitNetAmount()));
-            itemMap.put(RequestMap.ITEM_TOTAL_NET_AMNT, formatter.format(item.unitNetAmount()));
+            itemMap.put(RequestMap.ITEM_TOTAL_NET_AMNT, formatter.format(item.totalNetAmount()));
             items.add(itemMap);
         }
         requestMap.put(RequestMap.ITEMS, List.copyOf(items));
