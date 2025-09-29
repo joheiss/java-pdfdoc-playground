@@ -58,7 +58,7 @@ class PdfInvoiceDocumentFactoryTest {
             log.info("Due Payable: {}", tc.getDuePayable());
             log.info("Allowance Total: {}", tc.getAllowanceTotal());
             log.info("Grand Total: {}", tc.getGrandTotal());
-            assertEquals(new BigDecimal("13994.40"), tc.getGrandTotal());
+            assertEquals(new BigDecimal("14.660,80"), tc.getGrandTotal());
         } catch (XPathExpressionException | ParseException e) {
             throw new RuntimeException(e);
         }
@@ -67,19 +67,19 @@ class PdfInvoiceDocumentFactoryTest {
     private CreatePdfInvoiceRequest makeCreateInvoiceDocumentRequest() {
 
         return new CreatePdfInvoiceRequest(
-                5217,
-                LocalDate.of(2025, 9, 2),
+                5218,
+                LocalDate.of(2025, 10, 6),
                 1014,
                 List.of("DEED Consulting GmbH", "", "Karl-Benz-Str. 9", "40764 Langenfeld(Rhld.)"),
-                4130,
-                "PVRA250327FJH - Leistungszeitraum August 2025",
+                4131,
+                "PVRA250327FJH - Leistungszeitraum September 2025",
                 "EUR",
                 19.0,
-                List.of(new CreatePdfInvoiceItemRequest(1,168,"Arbeitsstunden (remote)", 70.00, 11760.00)
+                List.of(new CreatePdfInvoiceItemRequest(1,176,"Arbeitsstunden (remote)", 70.00, 12320.00)
                         ),
-                11760.00,
-                2234.40,
-                13994.40,
+                12320.00,
+                2340.80,
+                14660.80,
                 "Zahlbar innerhalb von 45 Tagen ohne Abzug",
                 "PVRA250327FJH",
                 """

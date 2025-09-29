@@ -106,17 +106,17 @@ class PdfInvoiceDocumentTest {
         requestMap.put(RequestMap.ITEM_UNIT_NET_AMNT_HDR, "Einzelpreis");
         requestMap.put(RequestMap.ITEM_TOTAL_NET_AMNT_HDR, "Gesamtpreis");
         // invoice document
-        requestMap.put(RequestMap.INVOICE_ID, "5212");
-        requestMap.put(RequestMap.INVOICE_DATE, "2.5.2025");
+        requestMap.put(RequestMap.INVOICE_ID, "5218");
+        requestMap.put(RequestMap.INVOICE_DATE, "6.10.2025");
         requestMap.put(RequestMap.CUSTOMER_ID, "1014");
         requestMap.put(RequestMap.ADDRESS_LINES, List.of("DEED Consulting GmbH", "", "Karl-Benz-Str. 9", "40764 Langenfeld(Rhld.)"));
-        requestMap.put(RequestMap.BILLING_PERIOD, "PVRA250327FJH - Leistungszeitraum April 2025");
+        requestMap.put(RequestMap.BILLING_PERIOD, "PVRA250327FJH - Leistungszeitraum September 2025");
         requestMap.put(RequestMap.TOTAL_NET_AMNT_HDR, "Nettobetrag");
         requestMap.put(RequestMap.TOTAL_VAT_AMNT_HDR, "19% MwSt");
         requestMap.put(RequestMap.TOTAL_GROSS_AMNT_HDR, "Bruttobetrag");
-        requestMap.put(RequestMap.TOTAL_NET_AMNT, "8.240,00 €");
-        requestMap.put(RequestMap.TOTAL_VAT_AMNT, "1.565,60 €");
-        requestMap.put(RequestMap.TOTAL_GROSS_AMNT, "9.805,60 €");
+        requestMap.put(RequestMap.TOTAL_NET_AMNT, "12.320,00 €");
+        requestMap.put(RequestMap.TOTAL_VAT_AMNT, "2.340,80 €");
+        requestMap.put(RequestMap.TOTAL_GROSS_AMNT, "14.660,80 €");
         requestMap.put(RequestMap.PAYMENT_TERMS, "Zahlbar innerhalb von 45 Tagen ohne Abzug");
         // requestMap.put(RequestMap.OPT_INVOICE_TEXTS, List.of(
         //        "Bitte beachten sie den geänderten Mehrwertsteuersatz von nun 25%.",
@@ -127,18 +127,18 @@ class PdfInvoiceDocumentTest {
                 List.of(
                         Map.of(
                                 RequestMap.ITEM_ID, "1",
-                                RequestMap.ITEM_QTY, "112",
+                                RequestMap.ITEM_QTY, "176",
                                 RequestMap.ITEM_DESC, "Arbeitsstunden (remote)",
                                 RequestMap.ITEM_UNIT_NET_AMNT, "70,00 €",
-                                RequestMap.ITEM_TOTAL_NET_AMNT, "7.840,00 €"
-                        ),
-                        Map.of(
-                                RequestMap.ITEM_ID, "2",
-                                RequestMap.ITEM_QTY, "5",
-                                RequestMap.ITEM_DESC, "Arbeitsstunden am Kundenstandort",
-                                RequestMap.ITEM_UNIT_NET_AMNT, "80,00 €",
-                                RequestMap.ITEM_TOTAL_NET_AMNT, "400,00 €"
+                                RequestMap.ITEM_TOTAL_NET_AMNT, "12.320,00 €"
                         )
+//                        Map.of(
+//                                RequestMap.ITEM_ID, "2",
+//                                RequestMap.ITEM_QTY, "5",
+//                                RequestMap.ITEM_DESC, "Arbeitsstunden am Kundenstandort",
+//                                RequestMap.ITEM_UNIT_NET_AMNT, "80,00 €",
+//                                RequestMap.ITEM_TOTAL_NET_AMNT, "400,00 €"
+//                        )
 //                        Map.of(
 //                                RequestMap.ITEM_ID, "3",
 //                                RequestMap.ITEM_QTY, "2",
