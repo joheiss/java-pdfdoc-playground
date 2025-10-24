@@ -67,12 +67,12 @@ class PdfInvoiceDocumentFactoryTest {
     private CreatePdfInvoiceRequest makeCreateInvoiceDocumentRequest() {
 
         return new CreatePdfInvoiceRequest(
-                5218,
-                LocalDate.of(2025, 10, 6),
+                5219,
+                LocalDate.of(2025, 11, 4),
                 1014,
                 List.of("DEED Consulting GmbH", "", "Karl-Benz-Str. 9", "40764 Langenfeld(Rhld.)"),
                 4131,
-                "PVRA250327FJH - Leistungszeitraum September 2025",
+                "PVRA250327FJH - Leistungszeitraum Oktober 2025",
                 "EUR",
                 19.0,
                 List.of(new CreatePdfInvoiceItemRequest(1,176,"Arbeitsstunden (remote)", 70.00, 12320.00)
