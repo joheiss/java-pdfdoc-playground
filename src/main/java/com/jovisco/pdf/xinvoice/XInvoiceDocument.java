@@ -88,7 +88,7 @@ public class XInvoiceDocument {
             item.setProduct(product);
             invoice.addItem(item);
         });
-        invoice.addCustomsNote(request.invoiceText());
+        invoice.addCustomsNote(!request.invoiceText().isEmpty() ? request.invoiceText().getFirst() : "");
         invoice.setContractReferencedDocument(String.valueOf(request.referenceNumber()));
         return invoice;
     }

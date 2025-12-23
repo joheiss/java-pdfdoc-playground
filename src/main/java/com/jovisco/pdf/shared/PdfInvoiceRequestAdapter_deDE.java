@@ -28,6 +28,7 @@ public class PdfInvoiceRequestAdapter_deDE {
         requestMap.put(RequestMap.INVOICE_DATE, request.invoiceDate().format(dateFormatter));
         requestMap.put(RequestMap.BILLING_PERIOD, request.billingPeriod());
         requestMap.put(RequestMap.PAYMENT_TERMS, request.paymentTerms());
+        requestMap.put(RequestMap.OPT_INVOICE_TEXTS, request.invoiceText());
         var formatter = NumberFormat.getCurrencyInstance();
         requestMap.put(RequestMap.TOTAL_NET_AMNT, formatter.format(request.totalNetAmount()));
         requestMap.put(RequestMap.TOTAL_VAT_AMNT, formatter.format(request.totalVatAmount()));

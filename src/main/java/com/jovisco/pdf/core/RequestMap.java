@@ -33,7 +33,7 @@ public class RequestMap {
     public static final String TOTAL_VAT_AMNT = "totalVatAmount";
     public static final String TOTAL_GROSS_AMNT = "totalGrossAmount";
     public static final String PAYMENT_TERMS = "paymentTerms";
-    public static final String OPT_INVOICE_TEXTS = "optionalInvoiceTexts";
+    public static final String OPT_INVOICE_TEXTS = "invoiceText";
 
     // invoice item
     public static final String ITEM_ID = "itemId";
