@@ -58,7 +58,7 @@ class PdfInvoiceDocumentFactoryTest {
             log.info("Due Payable: {}", tc.getDuePayable());
             log.info("Allowance Total: {}", tc.getAllowanceTotal());
             log.info("Grand Total: {}", tc.getGrandTotal());
-            assertEquals(new BigDecimal("12.661,60"), tc.getGrandTotal());
+            assertEquals(new BigDecimal("13.994.40"), tc.getGrandTotal());
         } catch (XPathExpressionException | ParseException e) {
             throw new RuntimeException(e);
         }
@@ -67,19 +67,19 @@ class PdfInvoiceDocumentFactoryTest {
     private CreatePdfInvoiceRequest makeCreateInvoiceDocumentRequest() {
 
         return new CreatePdfInvoiceRequest(
-                5221,
-                LocalDate.of(2026, 1, 2),
+                5222,
+                LocalDate.of(2026, 2, 2),
                 1014,
                 List.of("DEED Consulting GmbH", "", "Karl-Benz-Str. 9", "40764 Langenfeld(Rhld.)"),
                 4131,
-                "PVRA250327FJH - Leistungszeitraum Dezember 2025",
+                "PVRA250327FJH - Leistungszeitraum Januar 2026",
                 "EUR",
                 19.0,
-                List.of(new CreatePdfInvoiceItemRequest(1,152,"Arbeitsstunden F.J. Heiß (remote)", 70.00, 10640.00)
+                List.of(new CreatePdfInvoiceItemRequest(1,168,"Arbeitsstunden F.J. Heiß (remote)", 70.00, 11760.00)
                         ),
-                10640.00,
-                2021.60,
-                12661.60,
+                11760.00,
+                2234.40,
+                13994.40,
                 "Zahlbar innerhalb von 45 Tagen ohne Abzug",
                 "PVRA250327FJH",
                 // List.of("Eingesetzter Mitarbeiter: Franz Josef Heiß")
