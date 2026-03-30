@@ -68,18 +68,18 @@ class PdfInvoiceDocumentFactoryTest {
     private CreatePdfInvoiceRequest makeCreateInvoiceDocumentRequest() {
 
         var hourlyRate = 70.00;
-        var hours = 160;
+        var hours = 176;
         var totalNetAmount = hourlyRate * hours;
         var totalVatAmount = Math.round(totalNetAmount * 0.19);
         var totalGrossAmount = totalNetAmount + totalVatAmount;
 
         return new CreatePdfInvoiceRequest(
-                5223,
-                LocalDate.of(2026, 3, 2),
+                5224,
+                LocalDate.of(2026, 4, 2),
                 1014,
                 List.of("DEED Consulting GmbH", "", "Karl-Benz-Str. 9", "40764 Langenfeld(Rhld.)"),
                 4131,
-                "PVRA250327FJH - Leistungszeitraum Februar 2026",
+                "PVRA250327FJH - Leistungszeitraum März 2026",
                 "EUR",
                 19.0,
                 List.of(new CreatePdfInvoiceItemRequest(1,hours,"Arbeitsstunden F.J. Heiß (remote)", hourlyRate, totalNetAmount)
