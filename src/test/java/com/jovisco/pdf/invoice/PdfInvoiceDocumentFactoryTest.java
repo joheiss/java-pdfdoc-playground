@@ -70,7 +70,9 @@ class PdfInvoiceDocumentFactoryTest {
         var hourlyRate = 70.00;
         var hours = 176;
         var totalNetAmount = hourlyRate * hours;
-        var totalVatAmount = Math.round(totalNetAmount * 0.19);
+        var bd = new BigDecimal(totalNetAmount * 0.19);
+
+        var totalVatAmount = bd.setScale(2, RoundingMode.HALF_UP).doubleValue();
         var totalGrossAmount = totalNetAmount + totalVatAmount;
 
         return new CreatePdfInvoiceRequest(
